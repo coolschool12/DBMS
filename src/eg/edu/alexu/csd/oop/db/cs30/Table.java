@@ -8,6 +8,7 @@ public class Table {
     private HashMap<String,Integer> map=new HashMap<>();
     private String[] columnNames;
     private ArrayList<Row> rows;
+    private String tableName;
 
     public Table (String[] columnNames,Integer[] columnTypes){
         rows=new ArrayList<Row>();
@@ -16,7 +17,16 @@ public class Table {
             map.put(columnNames[i],columnTypes[i]);
         }
     }
-    public int insertRow(String[] columnNames,Object[] values){
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public int insertRow(String[] columnNames, Object[] values){
         Row neo=new Row(this.columnNames,columnNames,values);
         rows.add(neo);
         return 1;
