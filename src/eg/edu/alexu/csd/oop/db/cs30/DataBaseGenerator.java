@@ -1,4 +1,4 @@
-package eg.edu.alexu.csd.oop.db;
+package eg.edu.alexu.csd.oop.db.cs30;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
