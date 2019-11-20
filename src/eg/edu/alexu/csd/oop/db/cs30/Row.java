@@ -5,14 +5,15 @@ import java.util.HashMap;
 public class Row {
     private HashMap<String,Object> map=new HashMap<>();
 
-    public Row(String[] columnNames, String[] columnNames1, Object[] values) {
+    /**
+     *
+     * @param columnNames columns names you want to specify
+     * @param values the values of (columnNames1)
+     */
+    public Row(String[] columnNames, Object[] values) {
 
         for(int i=0;i<columnNames.length;i++){
-            map.put(columnNames[i],null);
-        }
-        for(int i=0;i<columnNames1.length;i++){
-            map.remove(columnNames1[i]);
-            map.put(columnNames1[i],values[i]);
+            map.put(columnNames[i],values[i]);
         }
     }
     public Object[] getRow(String[] columnNames){
@@ -24,13 +25,13 @@ public class Row {
     }
     public void updateRow(String[] columnNames, Object[] values){
         for(int i=0;i<columnNames.length;i++){
-            map.remove(columnNames[i]);
             map.put(columnNames[i],values[i]);
         }
     }
     public Boolean Condition(String ColumnName,char Operator,Object value,Integer type){
-        //System.out.println("In condition  " +this.map );
         Object val=map.get(ColumnName);
+        if(val == null)
+            return false;
         if(type==1){
             if(Operator=='='){
                 if(  ((Integer)val)  ==  ((Integer)value)  ) return true;
@@ -47,7 +48,6 @@ public class Row {
             }
         }else if(type==0){
             if(Operator=='='){
-                //System.out.println(val+" "+value);
                 if(  ((String)val).equals((String) value)  ) return true;
                 else return false;
             }else if(Operator=='>'){
