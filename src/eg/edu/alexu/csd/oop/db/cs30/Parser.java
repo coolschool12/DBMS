@@ -11,7 +11,7 @@ public class Parser {
     /**
      * Check sql query and call appropriate function.
      */
-    public void checkSql(String query) {
+    public boolean checkSql(String query) {
         String[] splitQuery = query.split(" ", 3);
 
         // Database = new DatabaseImplementation();
@@ -19,7 +19,7 @@ public class Parser {
         // Check number of substrings
         if (splitQuery.length != 3)
         {
-            return;
+            return false;
         }
 
         // Check statement type
@@ -33,7 +33,7 @@ public class Parser {
 
                 if (databaseName.length != 1)
                 {
-                    return;
+                    return false;
                 }
 
                 database.createDatabase(databaseName[0], false);
@@ -46,7 +46,13 @@ public class Parser {
                 }
                 catch (SQLException e) {
                     // Syntax error
+                    return false;
                 }
+            }
+            else
+            {
+                // Syntax error
+                return false;
             }
         }
         else if (splitQuery[0].equalsIgnoreCase("insert") || splitQuery[0].equalsIgnoreCase("update") || splitQuery[0].equalsIgnoreCase("delete"))
@@ -56,6 +62,7 @@ public class Parser {
             }
             catch (SQLException e) {
                 // Syntax error
+                return false;
             }
         }
         else if (splitQuery[0].equalsIgnoreCase("select"))
@@ -65,6 +72,7 @@ public class Parser {
             }
             catch (SQLException e) {
                 // Syntax error
+                return false;
             }
         }
         else if (splitQuery[0].equalsIgnoreCase("drop"))
@@ -74,7 +82,15 @@ public class Parser {
             }
             catch (SQLException e) {
                 // Syntax error
+                return false;
             }
         }
+        else
+        {
+            // Syntax error
+            return false;
+        }
+
+        return true;
     }
 }

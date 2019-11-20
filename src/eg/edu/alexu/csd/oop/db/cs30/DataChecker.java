@@ -11,7 +11,7 @@ public class DataChecker {
      * Check if CREATE DATABASE query is valid
      */
     boolean checkCreateDatabase(String query) {
-        Pattern pattern = Pattern.compile("(^\\S*CREATE\\s*DATABASE\\s*([^\\s]*|[^\\s]*\\s*;\\s*$))", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(^\\S*CREATE\\s+DATABASE\\s+([^\\s]*|[^\\s]*\\s*;\\s*$))", Pattern.CASE_INSENSITIVE);
         return pattern.matcher(query).matches();
     }
 
@@ -19,7 +19,7 @@ public class DataChecker {
      * Check if CREATE TABLE query is valid
      */
     boolean checkCreateTable(String query) {
-        Pattern pattern = Pattern.compile("(^\\s*CREATE\\s*TABLE\\s*[^\\s]+\\s*\\((\\s*[^\\s]+\\s*(int|varchar)\\s*,)*\\s*[^\\s]+\\s*(int|varchar)\\s*\\)(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(^\\s*CREATE\\s+TABLE\\s+[^\\s]+\\s*\\((\\s*[^\\s]+\\s+(int|varchar)\\s*,)*\\s*[^\\s]+\\s+(int|varchar)\\s*\\)(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
         return pattern.matcher(query).matches();
     }
 
@@ -61,7 +61,7 @@ public class DataChecker {
      * Check DROP DATABASE query.
      */
     boolean checkDropDatabase(String query) {
-        Pattern pattern = Pattern.compile("(^\\s*DROP\\s*DATABASE\\s*[^\\s*]+\\s*(;|\\s*)\\s*$)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(^\\s*DROP\\s+DATABASE\\s+[^\\s*]+\\s*(;|\\s*)\\s*$)", Pattern.CASE_INSENSITIVE);
         return pattern.matcher(query).matches();
     }
 
@@ -69,7 +69,7 @@ public class DataChecker {
      * Check DROP TABLE query.
      */
     boolean checkDropTable(String query) {
-        Pattern pattern = Pattern.compile("(^\\s*DROP\\s*TABLE\\s*[^\\s*]+\\s*(;|\\s*)\\s*$)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(^\\s*DROP\\s+TABLE\\s+[^\\s*]+\\s*(;|\\s*)\\s*$)", Pattern.CASE_INSENSITIVE);
         return pattern.matcher(query).matches();
     }
 
@@ -77,7 +77,7 @@ public class DataChecker {
      * Check if INSERT query is valid
      */
     boolean checkInsert(String query) {
-        Pattern pattern = Pattern.compile("(^\\s*INSERT\\s*INTO\\s*[^\\s]+\\s*((\\((\\s*[^\\s]+\\s*,\\s*)*\\s*[^\\s]+\\s*\\))|(\\s*))\\s*VALUES\\s*\\((\\s*[^\\s]+\\s*,\\s*)*\\s*[^\\s]+\\s*\\)(\\s*|\\s*;\\s*)$)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(^\\s*INSERT\\s+INTO\\s+[^\\s]+\\s*((\\((\\s*[^\\s]+\\s*,\\s*)*\\s*[^\\s]+\\s*\\))|(\\s*))\\s*VALUES\\s*\\((\\s*[^\\s]+\\s*,\\s*)*\\s*[^\\s]+\\s*\\)(\\s*|\\s*;\\s*)$)", Pattern.CASE_INSENSITIVE);
         return pattern.matcher(query).matches();
     }
 
@@ -147,7 +147,7 @@ public class DataChecker {
     }
 
     boolean checkSelect(String query){
-        Pattern pattern = Pattern.compile("(select|SELECT)\\s+([a-zA-Z0-9_]+\\s*,*\\s*)+\\s+(from|FROM)\\s[a-zA-Z0-9_]+\\s+(where|WHERE)\\s*[a-zA-Z0-9_]+\\s*(=|>|<)\\s*[a-zA-Z0-9'\\s_]+|(select|SELECT)\\s+([a-zA-Z0-9_]+\\s*,*\\s*)+\\s+(from|FROM)\\s[a-zA-Z0-9_]+|(select|SELECT)+\\s*\\*\\s+(from|FROM)\\s[a-zA-Z0-9_]+\\s*(where|WHERE)\\s*[a-zA-Z0-9_]+\\s*(=|>|<)\\s*[a-zA-Z0-9'\\s_]+|(select|SELECT)+\\s*\\*\\s+(from|FROM)\\s[a-zA-Z0-9_]+",Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(^\\s*SELECT\\s+(([^\\s]+\\s*,\\s*)*\\s*([^\\s]+)|\\*)\\s+FROM\\s+[^\\s]+(\\s*|(\\s+WHERE\\s+[^\\s]+\\s+[><=]\\s+[^\\s]))(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
         return pattern.matcher(query).matches();
     }
 
@@ -217,7 +217,7 @@ public class DataChecker {
     }
 
     boolean checkDelete(String query){
-        Pattern pattern = Pattern.compile("(delete|DELETE)\\s+(FROM|from)\\s+[^\\s]+\\s*(WHERE|where)\\s*[a-zA-Z0-9_-]+\\s*(<|>|=)\\s*[a-zA-Z0-9'_\\s]+|(delete|DELETE)\\s+(FROM|from)\\s+[a-zA-Z0-9'_]+",Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(^\\s*DELETE\\s+FROM\\s+[^\\s]+(\\s+WHERE\\s+[^\\s]+\\s+[><=]\\s+[^\\s]|\\s*)(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
         return pattern.matcher(query).matches();
     }
 
@@ -245,7 +245,7 @@ public class DataChecker {
     }
 
     boolean checkUpdate(String query){
-        Pattern pattern = Pattern.compile("(UPDATE|update)\\s+[^\\s]+\\s+(SET|set)\\s+([a-zA-Z0-9_]+\\s*(=|<|>)\\s*[a-zA-Z0-9'_\\s]+,*\\s*)+(WHERE|where)\\s*[a-zA-Z0-09_]+\\s*(=|<|>)\\s*[a-zA-Z0-9_\\s]+|(UPDATE|update)\\s+[^\\s]+\\s+(SET|set)\\s+([a-zA-Z0-9_]+\\s*(=|<|>)\\s*[a-zA-Z0-9'_\\s]+,*\\s*)+",Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(^\\s*UPDATE\\s+[^\\s]+\\s+SET\\s+([^\\s]+\\s*=\\s*[^\\s]+\\s*,\\s*)*([^\\s]+\\s*=\\s*[^\\s]+)(\\s+WHERE\\s+[^\\s]+\\s*[>=<]\\s*[^\\s]+|\\s*)(\\s*;\\s*|\\s*)$)",Pattern.CASE_INSENSITIVE);
         return pattern.matcher(query).matches();
     }
 

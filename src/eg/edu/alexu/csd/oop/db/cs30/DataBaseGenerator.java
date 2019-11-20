@@ -1,9 +1,11 @@
 package eg.edu.alexu.csd.oop.db.cs30;
 
+import eg.edu.alexu.csd.oop.db.Database;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class DataBaseGenerator implements Database{
+public class DataBaseGenerator implements Database {
 
     private ArrayList<MyDataBase> dataBases;
     private MyDataBase activeDataBase;
