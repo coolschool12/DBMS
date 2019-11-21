@@ -85,7 +85,7 @@ class MyDataBase {
         Table selectedTable = getTheDesiredTable(properties.get("tableName"));
         if (selectedTable == null) throw new SQLException("OPS!!");
 
-       return selectedTable.deleteCondition(properties.get("condColumns"), properties.get("operator").toCharArray()[0], properties.get("condValue"));
+       return selectedTable.delete(properties.get("condColumns"), properties.get("operator").toCharArray()[0], properties.get("condValue"));
     }
 
     int update(HashMap<String, String> properties) throws SQLException {
@@ -93,13 +93,14 @@ class MyDataBase {
         Table selectedTable = getTheDesiredTable(properties.get("tableName"));
         if (selectedTable == null) throw new SQLException("OPS!!");
 
+        String[] columnNames = (String[]) getColumnsStuff(properties, "selectedColumn");
+        Object[] columnValues = getColumnsStuff(properties, "setValue");
+
         if (properties.containsKey("operator"))
-        {
-            String[] columnNames = (String[]) getColumnsStuff(properties, "selectedColumn");
-            Object[] columnValues = getColumnsStuff(properties, "setValue");
-            return selectedTable.updateCondition(columnNames, columnValues, properties.get("condColumns"), properties.get("operator").toCharArray()[0], properties.get("condValue"));
-        }
-        return 0;
+            return selectedTable.update(columnNames, columnValues, properties.get("condColumns"), properties.get("operator").toCharArray()[0], properties.get("condValue"));
+
+        else
+            return selectedTable.update(columnNames, columnValues);
     }
 
     String getName() {
