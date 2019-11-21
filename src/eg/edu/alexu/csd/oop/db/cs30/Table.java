@@ -72,7 +72,7 @@ public class Table {
         return result;
     }
     // Delete some of table's rows (rows selection depend on the condition)
-    public int deleteCondition(String ColumnName,char Operator,Object value) throws RuntimeException{
+    public int delete(String ColumnName,char Operator,Object value) throws RuntimeException{
         this.checkCondition(ColumnName,value);
         Integer typeOfColumn=map.get(ColumnName);
         int counter=0;
@@ -88,7 +88,7 @@ public class Table {
         return counter;
     }
     // update some of columns(columnNames) with certain (values) for some rows (rows selection depend on the condition)
-    public int updateCondition(String[] columnNames,Object[] values,String ColumnName,char Operator,Object value) throws RuntimeException{
+    public int update(String[] columnNames,Object[] values,String ColumnName,char Operator,Object value) throws RuntimeException{
         this.checkCondition(ColumnName,value);
         this.checkColumns(columnNames);
         this.checkTypes(columnNames,values);
@@ -102,6 +102,14 @@ public class Table {
            }
         }
         return counter;
+    }
+    // update some of columns(columnNames) with certain (values) for all rows
+    public int update(String[] columnNames,Object[] values) throws RuntimeException{
+        this.checkColumns(columnNames);
+        this.checkTypes(columnNames,values);
+        for(int i=0;i<rows.size();i++)
+            rows.get(i).updateRow(columnNames,values);
+        return rows.size();
     }
     private void checkTypes(String[] columnNames,Object[] values) throws RuntimeException{
         //check same size
