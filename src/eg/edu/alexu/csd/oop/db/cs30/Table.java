@@ -37,7 +37,7 @@ public class Table {
         return 1;
     }
     // select all table
-    public Object[][] selectAll(){
+    public Object[][] select(){
         return select(this.columnNames);
     }
     // select some of table's columns
@@ -47,8 +47,12 @@ public class Table {
             selectedRows.add(i);
         return SelectFromRows(columnNames,selectedRows);
     }
+    // select all columns and some of table's rows (rows selection depend on the condition)
+    public Object[][] select(String ColumnName,char Operator,Object value) throws RuntimeException{
+        return select(this.columnNames,ColumnName,Operator,value);
+    }
     // select some of table's columns and some of table's rows (rows selection depend on the condition)
-    public Object[][] selectCondition(String[] columnNames,String ColumnName,char Operator,Object value) throws RuntimeException{
+    public Object[][] select(String[] columnNames,String ColumnName,char Operator,Object value) throws RuntimeException{
         this.checkCondition(ColumnName,value);
         Integer typeOfColumn=map.get(ColumnName);
         ArrayList<Integer> selectedRows=new ArrayList<Integer>();
