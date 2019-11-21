@@ -4,6 +4,7 @@ import eg.edu.alexu.csd.oop.db.Database;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class DataBaseGenerator implements Database {
 
@@ -43,10 +44,10 @@ public class DataBaseGenerator implements Database {
     @Override
     public boolean executeStructureQuery(String query) throws SQLException {
 
-        if (dataChecker.checkCreateDatabase(query))
+        if (dataChecker.checkCreateDatabase(query) || dataChecker.checkDropDatabase(query))
             return dealWithDatabase(query);
 
-        else if (dataChecker.checkCreateTable(query))
+        else if (dataChecker.checkCreateTable(query) || dataChecker.checkDropTable(query))
             return dealWithTable(query);
 
         else
@@ -57,7 +58,10 @@ public class DataBaseGenerator implements Database {
     @Override
     public Object[][] executeQuery(String query) throws SQLException {
 
-        return new Object[0][];
+        if (dataChecker.checkSelect(query))
+            return activeDataBase.select((HashMap<String, String>) dataChecker.SelectedProperties(query));
+        else
+            throw new SQLException("OPS!!");
     }
 
 
@@ -70,7 +74,14 @@ public class DataBaseGenerator implements Database {
         if (dataChecker.checkInsert(query))
             return activeDataBase.editTable(dataChecker.getObjectsToInsert(query), query.split(" ")[2]);
 
-        return 0;
+        else if (dataChecker.checkDelete(query))
+            return activeDataBase.delete((HashMap<String, String>) dataChecker.DeleteProperties(query));
+
+        else if (dataChecker.checkUpdate(query))
+            return activeDataBase.update((HashMap<String, String>) dataChecker.UpadteProperties(query));
+
+        else
+            throw new SQLException("OPS!!");
     }
 
 
@@ -130,5 +141,7 @@ public class DataBaseGenerator implements Database {
         }
         return flag;
     }
+
+
 
 }

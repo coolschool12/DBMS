@@ -156,7 +156,7 @@ public class DataChecker {
      * @param s
      * @return
      */
-    private Map<String , String> SelectedProperties(String s ) {
+    public Map<String , String> SelectedProperties(String s) {
         s = s.replaceAll("'","");
         String condValue;
         Map <String , String> table = new HashMap<>();
@@ -185,9 +185,9 @@ public class DataChecker {
         }else if(s.toLowerCase().contains("where")){
             String[] splitQuery = s.split("[\\s,]+");
 
-            int i=1;
+            int i;
             for( i=1;!splitQuery[i].equalsIgnoreCase("from");i++){
-                table.put("selectedColumn"+ Integer.toString(i) ,splitQuery[i]);
+                table.put("selectedColumn"+ i,splitQuery[i]);
             }
             table.put("sizeOfSelectedColoumns",Integer.toString(i-1));
 
@@ -205,9 +205,9 @@ public class DataChecker {
         }
         else{
             String[] splitQuery = s.split("[\\s,]+");
-            int i=1;
+            int i;
             for( i=1;!splitQuery[i].equalsIgnoreCase("from");i++){
-                table.put("selectedColumn"+ Integer.toString(i) ,splitQuery[i]);
+                table.put("selectedColumn"+ i,splitQuery[i]);
             }
             table.put("sizeOfSelectedColoumns",Integer.toString(i-1));
             table.put("tableName" , splitQuery[i+1]);
@@ -221,7 +221,7 @@ public class DataChecker {
         return pattern.matcher(query).matches();
     }
 
-    private Map<String , String> DeleteProperties(String s){
+    public Map<String , String> DeleteProperties(String s){
         s = s.replaceAll("'","");
         Map <String , String> table = new HashMap<>();
         table.put("type","0");
@@ -249,7 +249,7 @@ public class DataChecker {
         return pattern.matcher(query).matches();
     }
 
-    private Map<String , String> UpadteProperties( String s){
+    public Map<String , String> UpadteProperties( String s){
         s = s.replaceAll("'","");
         Map <String , String> table = new HashMap<>();
 
@@ -267,11 +267,11 @@ public class DataChecker {
 
             int m =1;
             for(int j=0;j<=(splitQuery.length-4)/2;j++){
-                table.put("setColumn"+Integer.toString(m),splitQuery[j+2]);
-                table.put("setValue"+Integer.toString(m++),splitQuery[j+3]);
+                table.put("selectedColumn"+ m,splitQuery[j+2]);
+                table.put("setValue"+ m++,splitQuery[j+3]);
                 j++;
             }
-            table.put("sizeofsetcolumns" ,Integer.toString(m-1));
+            table.put("sizeOfSelectedColoumns" ,Integer.toString(m-1));
             table.put("tableName" , splitQuery[1]);
             table.put("condColumns" , splitQuery[splitQuery.length-2]);
             table.put("condValue" , splitQuery[splitQuery.length-1]);
@@ -282,14 +282,14 @@ public class DataChecker {
             String[] splitQuery = s.split("(UPDATE|update)\\s|\\s*=\\s*|(SET|set)\\s+|'|\\s*,\\s*");
             int m =1;
             for(int j=0;j<=(splitQuery.length-2)/2;j++){
-                table.put("setColumn"+Integer.toString(m),splitQuery[j+2]);
-                table.put("setValue"+Integer.toString(m++),splitQuery[j+3]);
+                table.put("selectedColumn"+ m,splitQuery[j+2]);
+                table.put("setValue"+ m++,splitQuery[j+3]);
                 j++;
             }
+            table.put("sizeOfSelectedColoumns" ,Integer.toString(m-1));
             table.put("tableName" , splitQuery[1]);
         }
         return table;
     }
-
 
 }

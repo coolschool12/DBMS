@@ -1,8 +1,10 @@
 package eg.edu.alexu.csd.oop.db.cs30;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-public class MyDataBase {
+class MyDataBase {
     private ArrayList<Table>tables;
     private String name;
     private String path;
@@ -13,7 +15,7 @@ public class MyDataBase {
         tables = new ArrayList<>();
     }
 
-    public boolean addTable(Object[][] Data, String tableName)
+    boolean addTable(Object[][] Data, String tableName)
     {
         ArrayList<String> ColumnsNames = new ArrayList<>();
         ArrayList<Integer> ColumnsTypes = new ArrayList<>();
@@ -32,7 +34,7 @@ public class MyDataBase {
 
     }
 
-    public boolean removeTable(String tableName)
+    boolean removeTable(String tableName)
     {
         Table desiredTable = getTheDesiredTable(tableName);
 
@@ -40,7 +42,7 @@ public class MyDataBase {
 
     }
 
-    public int editTable(Object[][] newContent, String tableName)
+    int editTable(Object[][] newContent, String tableName)
     {
         Table desiredTable = getTheDesiredTable(tableName);
 
@@ -54,11 +56,57 @@ public class MyDataBase {
         }
     }
 
-    public String getName() {
+    Object[][] select(HashMap<String, String> properties) throws SQLException {
+
+        Table selectedTable = getTheDesiredTable(properties.get("tableName"));
+        if (selectedTable == null) throw new SQLException("NO TABLE EXIST");
+
+        if (properties.get("starflag").equals("1")) {
+            if (properties.containsKey("operator"))
+                return selectedTable.select(properties.get("condColumns"), properties.get("operator").toCharArray()[0], properties.get("condValue"));
+
+            else
+                return selectedTable.select();
+        }
+        else {
+            String[] columnNames = (String[]) getColumnsStuff(properties, "selectedColumn");
+
+            if (properties.containsKey("operator"))
+                return selectedTable.select(columnNames, properties.get("condColumns"), properties.get("operator").toCharArray()[0], properties.get("condValue"));
+
+            else
+                return selectedTable.select(columnNames);
+        }
+
+    }
+
+    int delete(HashMap<String, String> properties) throws SQLException {
+
+        Table selectedTable = getTheDesiredTable(properties.get("tableName"));
+        if (selectedTable == null) throw new SQLException("OPS!!");
+
+       return selectedTable.deleteCondition(properties.get("condColumns"), properties.get("operator").toCharArray()[0], properties.get("condValue"));
+    }
+
+    int update(HashMap<String, String> properties) throws SQLException {
+
+        Table selectedTable = getTheDesiredTable(properties.get("tableName"));
+        if (selectedTable == null) throw new SQLException("OPS!!");
+
+        if (properties.containsKey("operator"))
+        {
+            String[] columnNames = (String[]) getColumnsStuff(properties, "selectedColumn");
+            Object[] columnValues = getColumnsStuff(properties, "setValue");
+            return selectedTable.updateCondition(columnNames, columnValues, properties.get("condColumns"), properties.get("operator").toCharArray()[0], properties.get("condValue"));
+        }
+        return 0;
+    }
+
+    String getName() {
         return name;
     }
 
-    public String getPath() {
+    String getPath() {
         return path;
     }
     private Table getTheDesiredTable(String tableName)
@@ -72,4 +120,17 @@ public class MyDataBase {
         }
         return null;
     }
+
+    private Object[] getColumnsStuff(HashMap<String, String> properties, String val)
+    {
+           ArrayList<String> columnsStuff = new ArrayList<>();
+           long size = Integer.parseInt(properties.get("sizeOfSelectedColoumns"));
+
+           for (long i = 1; i <= size; i++)
+               columnsStuff.add(properties.get(val + i));
+
+           return columnsStuff.toArray(new String[0]);
+    }
+
+
 }
