@@ -6,15 +6,12 @@ import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 public class Parser {
-    private Database database;
-
     /**
      * Check sql query and call appropriate function.
      */
     public boolean checkSql(String query) {
+        Database database = new DataBaseGenerator();
         String[] splitQuery = query.split(" ", 3);
-
-        // Database = new DatabaseImplementation();
 
         // Check number of substrings
         if (splitQuery.length != 3)

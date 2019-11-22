@@ -1,28 +1,12 @@
-package eg.edu.alexu.csd.oop.db.cs30;
+package eg.edu.alexu.csd.oop.db.cs30.queries;
 
 import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * Check if a query is valid and return extracted data
+ * Extract useful data from a string and other helpful functions
  */
-public class DataChecker {
-    /**
-     * Check if CREATE DATABASE query is valid
-     */
-    boolean checkCreateDatabase(String query) {
-        Pattern pattern = Pattern.compile("(^\\S*CREATE\\s+DATABASE\\s+([^\\s]*|[^\\s]*\\s*;\\s*$))", Pattern.CASE_INSENSITIVE);
-        return pattern.matcher(query).matches();
-    }
-
-    /**
-     * Check if CREATE TABLE query is valid
-     */
-    boolean checkCreateTable(String query) {
-        Pattern pattern = Pattern.compile("(^\\s*CREATE\\s+TABLE\\s+[^\\s]+\\s*\\((\\s*[^\\s]+\\s+(int|varchar)\\s*,)*\\s*[^\\s]+\\s+(int|varchar)\\s*\\)(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
-        return pattern.matcher(query).matches();
-    }
-
+public class ExtractData {
     /**
      * Get names of columns and values to insert in a table from a CREATE query
      *
@@ -42,11 +26,11 @@ public class DataChecker {
 
             if (splitNameTypeString[1].equalsIgnoreCase("int"))
             {
-                ints.add(splitNameTypeString[0]);
+                ints.add(splitNameTypeString[0].toLowerCase());
             }
             else if (splitNameTypeString[1].equalsIgnoreCase("varchar"))
             {
-                varchars.add(splitNameTypeString[0]);
+                varchars.add(splitNameTypeString[0].toLowerCase());
             }
         }
 
@@ -55,30 +39,6 @@ public class DataChecker {
         tableColumns[1] = varchars.toArray(new String[0]);
 
         return tableColumns;
-    }
-
-    /**
-     * Check DROP DATABASE query.
-     */
-    boolean checkDropDatabase(String query) {
-        Pattern pattern = Pattern.compile("(^\\s*DROP\\s+DATABASE\\s+[^\\s*]+\\s*(;|\\s*)\\s*$)", Pattern.CASE_INSENSITIVE);
-        return pattern.matcher(query).matches();
-    }
-
-    /**
-     * Check DROP TABLE query.
-     */
-    boolean checkDropTable(String query) {
-        Pattern pattern = Pattern.compile("(^\\s*DROP\\s+TABLE\\s+[^\\s*]+\\s*(;|\\s*)\\s*$)", Pattern.CASE_INSENSITIVE);
-        return pattern.matcher(query).matches();
-    }
-
-    /**
-     * Check if INSERT query is valid
-     */
-    boolean checkInsert(String query) {
-        Pattern pattern = Pattern.compile("(^\\s*INSERT\\s+INTO\\s+[^\\s]+\\s*((\\((\\s*[^\\s]+\\s*,\\s*)*\\s*[^\\s]+\\s*\\))|(\\s*))\\s*VALUES\\s*\\((\\s*[^\\s]+\\s*,\\s*)*\\s*[^\\s]+\\s*\\)(\\s*|\\s*;\\s*)$)", Pattern.CASE_INSENSITIVE);
-        return pattern.matcher(query).matches();
     }
 
     /**
@@ -129,26 +89,14 @@ public class DataChecker {
             {
                 values[i] = Integer.parseInt((String) objects[0][i]);
             }
+
+            // Cast column names to lowercase
+            objects[1][i] = ((String) objects[1][i]).toLowerCase();
         }
 
         objects[0] = values;
 
         return objects;
-    }
-
-    /**
-     * Remove empty strings from an array
-     */
-    private String[] removeEmptyStrings(String[] stringsArray) {
-        List<String> removeEmptyElements = new ArrayList<>(Arrays.asList(stringsArray));
-        removeEmptyElements.removeAll(Collections.singleton(""));
-
-        return removeEmptyElements.toArray(new String[0]);
-    }
-
-    boolean checkSelect(String query){
-        Pattern pattern = Pattern.compile("(^\\s*SELECT\\s+(([^\\s]+\\s*,\\s*)*\\s*([^\\s]+)|\\*)\\s+FROM\\s+[^\\s]+(\\s*|(\\s+WHERE\\s+[^\\s]+\\s+[><=]\\s+[^\\s]))(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
-        return pattern.matcher(query).matches();
     }
 
     /**
@@ -216,11 +164,6 @@ public class DataChecker {
 
     }
 
-    boolean checkDelete(String query){
-        Pattern pattern = Pattern.compile("(^\\s*DELETE\\s+FROM\\s+[^\\s]+(\\s+WHERE\\s+[^\\s]+\\s+[><=]\\s+[^\\s]|\\s*)(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
-        return pattern.matcher(query).matches();
-    }
-
     public Map<String , String> DeleteProperties(String s){
         s = s.replaceAll("'","");
         Map <String , String> table = new HashMap<>();
@@ -242,11 +185,6 @@ public class DataChecker {
             table.put("tableName" , splitQuery[2]);
         }
         return table;
-    }
-
-    boolean checkUpdate(String query){
-        Pattern pattern = Pattern.compile("(^\\s*UPDATE\\s+[^\\s]+\\s+SET\\s+([^\\s]+\\s*=\\s*[^\\s]+\\s*,\\s*)*([^\\s]+\\s*=\\s*[^\\s]+)(\\s+WHERE\\s+[^\\s]+\\s*[>=<]\\s*[^\\s]+|\\s*)(\\s*;\\s*|\\s*)$)",Pattern.CASE_INSENSITIVE);
-        return pattern.matcher(query).matches();
     }
 
     public Map<String , String> UpadteProperties( String s){
@@ -292,4 +230,33 @@ public class DataChecker {
         return table;
     }
 
+    /**
+     * @return table's name extracted from a query
+     */
+    public String getTableName(String query) {
+        Pattern pattern = Pattern.compile("(\\s*((CREATE|DROP)\\s*TABLE|INSERT\\s*INTO|UPDATE|DELETE\\s*FROM|SELECT.*FROM)\\s*|\\s*VALUES\\s*|\\s*SET.*|\\s*WHERE.*|\\s*\\(.*\\)\\s*|\\s*;\\s*$)", Pattern.CASE_INSENSITIVE);
+        String[] splitQuery = this.removeEmptyStrings(pattern.split(query));
+
+        return splitQuery[0].toLowerCase();
+    }
+
+    /**
+     * @return database's name extracted from a query
+     */
+    public String getDatabaseName(String query) {
+        Pattern pattern = Pattern.compile("(^\\s*(CREATE|DROP)\\s*DATABASE\\s*|\\s*;\\s*$)", Pattern.CASE_INSENSITIVE);
+        String[] splitQuery = this.removeEmptyStrings(pattern.split(query));
+
+        return splitQuery[0].toLowerCase();
+    }
+
+    /**
+     * Remove empty strings from an array
+     */
+    private String[] removeEmptyStrings(String[] stringsArray) {
+        List<String> removeEmptyElements = new ArrayList<>(Arrays.asList(stringsArray));
+        removeEmptyElements.removeAll(Collections.singleton(""));
+
+        return removeEmptyElements.toArray(new String[0]);
+    }
 }
