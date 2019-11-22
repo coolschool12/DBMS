@@ -1,6 +1,9 @@
 package eg.edu.alexu.csd.oop.db.cs30;
 
 import eg.edu.alexu.csd.oop.db.Database;
+import eg.edu.alexu.csd.oop.db.cs30.queries.ExtractData;
+import eg.edu.alexu.csd.oop.db.cs30.queries.Query;
+import eg.edu.alexu.csd.oop.db.cs30.queries.QueryBuilder;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,10 +13,10 @@ public class DataBaseGenerator implements Database {
 
     private ArrayList<MyDataBase> dataBases;
     private MyDataBase activeDataBase;
-    private DataChecker dataChecker;
+    private ExtractData extractData;
     DataBaseGenerator()
     {
-        dataChecker = new DataChecker();
+        extractData = new ExtractData();
         dataBases = new ArrayList<>();
     }
 
@@ -44,11 +47,14 @@ public class DataBaseGenerator implements Database {
     @Override
     public boolean executeStructureQuery(String query) throws SQLException {
 
-        if (dataChecker.checkCreateDatabase(query) || dataChecker.checkDropDatabase(query))
-            return dealWithDatabase(query);
+        Query exp = QueryBuilder.buildQuery(query);
+        if (exp == null || !exp.isCorrect(query)) throw new SQLException("OPS!!");
 
-        else if (dataChecker.checkCreateTable(query) || dataChecker.checkDropTable(query))
-            return dealWithTable(query);
+        if (exp.getId() == 0 || exp.getId() == 2)
+            return dealWithDatabase(query, exp);
+
+        else if (exp.getId() == 1 || exp.getId() == 3)
+            return dealWithTable(query, exp);
 
         else
             return false;
@@ -58,8 +64,13 @@ public class DataBaseGenerator implements Database {
     @Override
     public Object[][] executeQuery(String query) throws SQLException {
 
-        if (dataChecker.checkSelect(query))
-            return activeDataBase.select((HashMap<String, String>) dataChecker.SelectedProperties(query));
+        Query exp = QueryBuilder.buildQuery(query);
+
+        if (exp == null || activeDataBase == null)
+            throw new SQLException("THERE IS NO AN ACTIVE DATABASE!!!");
+
+        if (exp.isCorrect(query) && exp.getId() == 7)
+            return activeDataBase.select((HashMap<String, String>) extractData.SelectedProperties(query));
         else
             throw new SQLException("OPS!!");
     }
@@ -68,46 +79,45 @@ public class DataBaseGenerator implements Database {
     @Override
     public int executeUpdateQuery(String query) throws SQLException {
 
-        if (activeDataBase == null)
+        Query exp = QueryBuilder.buildQuery(query);
+
+        if (activeDataBase == null || exp == null|| !exp.isCorrect(query))
             throw new SQLException("THERE IS NO AN ACTIVE DATABASE!!!");
 
-        if (dataChecker.checkInsert(query))
-            return activeDataBase.editTable(dataChecker.getObjectsToInsert(query), query.split(" ")[2]);
+        if (exp.getId() == 4)
+            return activeDataBase.editTable(extractData.getObjectsToInsert(query), extractData.getTableName(query));
 
-        else if (dataChecker.checkDelete(query))
-            return activeDataBase.delete((HashMap<String, String>) dataChecker.DeleteProperties(query));
+        else if (exp.getId() == 5)
+            return activeDataBase.delete((HashMap<String, String>) extractData.DeleteProperties(query));
 
-        else if (dataChecker.checkUpdate(query))
-            return activeDataBase.update((HashMap<String, String>) dataChecker.UpadteProperties(query));
+        else if (exp.getId() == 6)
+            return activeDataBase.update((HashMap<String, String>) extractData.UpadteProperties(query));
 
         else
             throw new SQLException("OPS!!");
     }
 
 
-    private boolean dealWithDatabase(String query) throws SQLException
+    private boolean dealWithDatabase(String query, Query exp) throws SQLException
     {
-        boolean isFound = searchForThatName(query.split(" ")[2]);
+        String dataBaseName = extractData.getDatabaseName(query);
+        boolean isFound = searchForThatName(dataBaseName);
 
-        if (query.split(" ")[0].equalsIgnoreCase("DROP"))
+        if (exp.getId() == 2)
         {
             if (!isFound) {
                 throw new SQLException("THE TABLE DOESNT EXIST !!!!");
             }
-
             else
             {
                 dataBases.remove(activeDataBase);
                 activeDataBase = null;
                 return true;
             }
-
         }
-        else if (query.split(" ")[0].equalsIgnoreCase("CREATE"))
-        {
-            if (!isFound)
-            {
-                activeDataBase = new MyDataBase(query.split(" ")[2]);
+        else if (exp.getId() == 0) {
+            if (!isFound) {
+                activeDataBase = new MyDataBase(dataBaseName);
                 dataBases.add(activeDataBase);
                 return true;
             }
@@ -117,15 +127,16 @@ public class DataBaseGenerator implements Database {
         return false;
     }
 
-    private boolean dealWithTable(String query) throws SQLException {
+    private boolean dealWithTable(String query, Query exp) throws SQLException {
         if (activeDataBase == null)
             throw new SQLException();
 
-        if (query.split(" ")[0].equalsIgnoreCase("DROP"))
-            return activeDataBase.removeTable(query.split(" ")[2]);
+        String tableName = extractData.getTableName(query);
+        if (exp.getId() == 3)
+            return activeDataBase.removeTable(tableName);
 
         else
-            return activeDataBase.addTable(dataChecker.getContentsOfTableQuery(query), query.split(" ")[2]);
+            return activeDataBase.addTable(extractData.getContentsOfTableQuery(query), tableName);
 
     }
 

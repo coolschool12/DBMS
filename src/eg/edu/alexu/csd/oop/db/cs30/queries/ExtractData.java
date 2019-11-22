@@ -13,7 +13,7 @@ public class ExtractData {
      * Column 0: int objects
      * Column 1: varchar objects
      */
-    Object[][] getContentsOfTableQuery(String query) {
+    public Object[][] getContentsOfTableQuery(String query) {
         Pattern pattern = Pattern.compile("(\\s*CREATE\\s*TABLE\\s*[^\\s(]+\\s*|\\s*\\(\\s*|\\s*\\)\\s*;\\s*$|\\s*\\)\\s*$|\\s*,\\s*)", Pattern.CASE_INSENSITIVE);
         String[] tableContent =  this.removeEmptyStrings(pattern.split(query));
 
@@ -47,7 +47,7 @@ public class ExtractData {
      * Column 0: values to insert
      * Column 1: names of the columns, can be null if no names are specified
      */
-    Object[][] getObjectsToInsert(String query) {
+    public Object[][] getObjectsToInsert(String query) {
         Pattern pattern = Pattern.compile("(^\\s*INSERT\\s*INTO\\s*[^\\s^(]+\\s*|\\s*VALUES\\s*|\\s*;\\s*$)", Pattern.CASE_INSENSITIVE);
         String[] twoLists = this.removeEmptyStrings(pattern.split(query));
 
