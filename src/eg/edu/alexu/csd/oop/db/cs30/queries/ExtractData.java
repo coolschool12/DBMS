@@ -1,5 +1,6 @@
 package eg.edu.alexu.csd.oop.db.cs30.queries;
 
+import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -8,8 +9,7 @@ import java.util.regex.Pattern;
  */
 public class ExtractData {
     /**
-     * Get names of columns and values to insert in a table from a CREATE query
-     *
+     * @return names of columns and values to insert in a table from a CREATE query
      * Column 0: int objects
      * Column 1: varchar objects
      */
@@ -46,10 +46,12 @@ public class ExtractData {
     /**
      * Get objects to be inserted from INSERT query.
      *
-     * Column 0: values to insert
-     * Column 1: names of the columns, can be null if no names are specified
+     * @throws SQLException if query has incorrect values
+     * @return an array of objects
+     *      Column 0: values to insert
+     *      Column 1: names of the columns, can be null if no names are specified
      */
-    public Object[][] getObjectsToInsert(String query) {
+    public Object[][] getObjectsToInsert(String query) throws SQLException {
         query = query.toLowerCase();
 
         Pattern pattern = Pattern.compile("(^\\s*INSERT\\s*INTO\\s*[^\\s^(]+\\s*|\\s*VALUES\\s*|\\s*;\\s*$)", Pattern.CASE_INSENSITIVE);
@@ -70,12 +72,12 @@ public class ExtractData {
 
             if (objects[0].length != objects[1].length)
             {
-                return null;
+                throw new SQLException("Non matching lengths.");
             }
         }
         else
         {
-            return null;
+            throw new SQLException("No values given.");
         }
 
         // Cast value strings
@@ -84,14 +86,19 @@ public class ExtractData {
         for (int i = 0, noOfObjects = objects[0].length; i < noOfObjects; i++)
         {
             // String input
-            if (Pattern.matches("(^'.*'$)", (String) objects[0][i]))
+            if (Pattern.matches("(^('.*'|\".*\")$)", (String) objects[0][i]))
             {
-                values[i] = ((String) objects[0][i]).replaceAll("(^'|'$)", "");
+                values[i] = ((String) objects[0][i]).replaceAll("(^'|'$)|(^\"|\"$)", "");
             }
             // Integer input
             else
             {
-                values[i] = Integer.parseInt((String) objects[0][i]);
+                try {
+                    values[i] = Integer.parseInt((String) objects[0][i]);
+                }
+                catch (Exception e) {
+                    throw new SQLException("Incorrect values.");
+                }
             }
 
             // Cast column names to lowercase
