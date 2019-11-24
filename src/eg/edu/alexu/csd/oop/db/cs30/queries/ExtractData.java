@@ -101,11 +101,12 @@ public class ExtractData {
 
     /**
      * the map contians every thing like tablename selectedcoloumns etc...
-     * @param s
+     * @param
      * @return
      */
     public Map<String , String> SelectedProperties(String s) {
         s = s.replaceAll("'","");
+        s = s.toLowerCase();
         String condValue;
         Map <String , String> table = new HashMap<>();
         table.put("type","0");
@@ -118,8 +119,8 @@ public class ExtractData {
             else if(s.toLowerCase().contains(">")) table.put("operator" , ">");
             else if(s.toLowerCase().contains("<")) table.put("operator" , "<");
 
-            table.put("tableName" , splitQuery[1].toLowerCase());
-            table.put("condColumns" , splitQuery[2].toLowerCase());
+            table.put("tableName" , splitQuery[1]);
+            table.put("condColumns" , splitQuery[2]);
             table.put("condValue" , splitQuery[3]);
 
             condValue= splitQuery[3];
@@ -129,13 +130,13 @@ public class ExtractData {
         else if(s.toLowerCase().contains("*")){
             table.put("starflag" , "1");
             String[] splitQuery = s.split("(from|FROM)\\s*");
-            table.put("tableName" , splitQuery[1].toLowerCase());
+            table.put("tableName" , splitQuery[1]);
         }else if(s.toLowerCase().contains("where")){
             String[] splitQuery = s.split("[\\s,]+");
 
             int i;
             for( i=1;!splitQuery[i].equalsIgnoreCase("from");i++){
-                table.put("selectedColumn"+ i,splitQuery[i].toLowerCase());
+                table.put("selectedColumn"+ i,splitQuery[i]);
             }
             table.put("sizeOfSelectedColoumns",Integer.toString(i-1));
 
@@ -144,8 +145,8 @@ public class ExtractData {
             else if(s.toLowerCase().contains(">")) table.put("operator" , ">");
             else if(s.toLowerCase().contains("<")) table.put("operator" , "<");
 
-            table.put("tableName" , splitQuery[1].toLowerCase());
-            table.put("condColumns" , splitQuery[2].toLowerCase());
+            table.put("tableName" , splitQuery[1]);
+            table.put("condColumns" , splitQuery[2]);
             table.put("condValue" , splitQuery[3]);
             condValue = splitQuery[3];
             if(condValue.matches("\\d+"))
@@ -155,10 +156,10 @@ public class ExtractData {
             String[] splitQuery = s.split("[\\s,]+");
             int i;
             for( i=1;!splitQuery[i].equalsIgnoreCase("from");i++){
-                table.put("selectedColumn"+ i,splitQuery[i].toLowerCase());
+                table.put("selectedColumn"+ i,splitQuery[i]);
             }
             table.put("sizeOfSelectedColoumns",Integer.toString(i-1));
-            table.put("tableName" , splitQuery[i+1].toLowerCase());
+            table.put("tableName" , splitQuery[i+1]);
         }
         return table;
 
@@ -166,7 +167,8 @@ public class ExtractData {
 
     public Map<String , String> DeleteProperties(String s){
         s = s.replaceAll("'","");
-    //    s = s.toLowerCase();
+
+        s = s.toLowerCase();
         Map <String , String> table = new HashMap<>();
         table.put("type","0");
         if(s.toLowerCase().contains("where")){
@@ -176,21 +178,22 @@ public class ExtractData {
             else if(s.toLowerCase().contains(">")) table.put("operator" , ">");
             else if(s.toLowerCase().contains("<")) table.put("operator" , "<");
 
-            table.put("tableName" , splitQuery[1].toLowerCase());
-            table.put("condColumns" , splitQuery[2].toLowerCase());
+            table.put("tableName" , splitQuery[1]);
+            table.put("condColumns" , splitQuery[2]);
             table.put("condValue" , splitQuery[3]);
             if(splitQuery[3].matches("\\d+"))
                 table.put("type","1");
 
         }else {
             String[] splitQuery = s.split("\\s+");
-            table.put("tableName" , splitQuery[2].toLowerCase());
+            table.put("tableName" , splitQuery[2]);
         }
         return table;
     }
 
     public Map<String , String> UpadteProperties( String s){
         s = s.replaceAll("'","");
+        s = s.toLowerCase();
         Map <String , String> table = new HashMap<>();
 
         if(s.toLowerCase().contains("where")){
@@ -203,14 +206,14 @@ public class ExtractData {
             else if(s.toLowerCase().contains("=")) table.put("operator" , "=");
 
             int m =1;
-            for(int j=0;j<=(splitQuery.length-4)/2;j++){
-                table.put("selectedColumn"+ m,splitQuery[j+2].toLowerCase());
+            for(int j=0;j<(splitQuery.length-4);){
+                table.put("selectedColumn"+ m,splitQuery[j+2]);
                 table.put("setValue"+ m++,splitQuery[j+3]);
-                j++;
+                j+=2;
             }
             table.put("sizeOfSelectedColoumns" ,Integer.toString(m-1));
-            table.put("tableName" , splitQuery[1]).toLowerCase();
-            table.put("condColumns" , splitQuery[splitQuery.length-2].toLowerCase());
+            table.put("tableName" , splitQuery[1]);
+            table.put("condColumns" , splitQuery[splitQuery.length-2]);
             table.put("condValue" , splitQuery[splitQuery.length-1]);
             if(splitQuery[splitQuery.length-1].matches("\\d+"))
                 table.put("type","1");
@@ -218,10 +221,10 @@ public class ExtractData {
         }else {
             String[] splitQuery = s.split("(UPDATE|update)\\s|\\s*=\\s*|(SET|set)\\s+|'|\\s*,\\s*");
             int m =1;
-            for(int j=0;j<=(splitQuery.length-2)/2;j++){
-                table.put("selectedColumn"+ m,splitQuery[j+2].toLowerCase());
+            for(int j=0;j<(splitQuery.length-2);){
+                table.put("selectedColumn"+ m,splitQuery[j+2]);
                 table.put("setValue"+ m++,splitQuery[j+3]);
-                j++;
+                j+=2;
             }
             table.put("sizeOfSelectedColoumns" ,Integer.toString(m-1));
             table.put("tableName" , splitQuery[1]);
@@ -258,4 +261,8 @@ public class ExtractData {
 
         return removeEmptyElements.toArray(new String[0]);
     }
+
+
+  
+
 }
