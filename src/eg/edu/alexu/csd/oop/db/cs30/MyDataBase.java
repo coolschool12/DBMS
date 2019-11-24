@@ -23,7 +23,7 @@ class MyDataBase {
         for (int i = 0; i < 2 ; i++)
             for (int j = 0; j < Data[i].length; j++) {
                 ColumnsNames.add((String) Data[i][j]);
-                ColumnsTypes.add(i);
+                ColumnsTypes.add(1 - i);
             }
 
         Table newTable = new Table(ColumnsNames.toArray(new String[0]), ColumnsTypes.toArray(new Integer[0]));
@@ -132,6 +132,4 @@ class MyDataBase {
 
            return columnsStuff.toArray(new String[0]);
     }
-
-
 }

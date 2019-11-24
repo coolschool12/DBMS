@@ -14,8 +14,10 @@ public class ExtractData {
      * Column 1: varchar objects
      */
     public Object[][] getContentsOfTableQuery(String query) {
+        query = query.toLowerCase();
+
         Pattern pattern = Pattern.compile("(\\s*CREATE\\s*TABLE\\s*[^\\s(]+\\s*|\\s*\\(\\s*|\\s*\\)\\s*;\\s*$|\\s*\\)\\s*$|\\s*,\\s*)", Pattern.CASE_INSENSITIVE);
-        String[] tableContent =  this.removeEmptyStrings(pattern.split(query));
+        String[] tableContent =  ExtractData.removeEmptyStrings(pattern.split(query));
 
         // Extract column names from table
         List<String> ints = new ArrayList<>();
@@ -48,21 +50,23 @@ public class ExtractData {
      * Column 1: names of the columns, can be null if no names are specified
      */
     public Object[][] getObjectsToInsert(String query) {
+        query = query.toLowerCase();
+
         Pattern pattern = Pattern.compile("(^\\s*INSERT\\s*INTO\\s*[^\\s^(]+\\s*|\\s*VALUES\\s*|\\s*;\\s*$)", Pattern.CASE_INSENSITIVE);
-        String[] twoLists = this.removeEmptyStrings(pattern.split(query));
+        String[] twoLists = ExtractData.removeEmptyStrings(pattern.split(query));
 
         Object[][] objects = new Object[2][];
 
         // Without column names
         if (twoLists.length == 1)
         {
-            objects[0] = this.removeEmptyStrings(twoLists[0].split("(\\s*,\\s*|\\s+|\\(|\\))"));
+            objects[0] = ExtractData.removeEmptyStrings(twoLists[0].split("(\\s*,\\s*|\\s+|\\(|\\))"));
         }
         // With column names
         else if (twoLists.length == 2)
         {
-            objects[0] = this.removeEmptyStrings(twoLists[1].split("(\\s*,\\s*|\\s+|\\(|\\))"));
-            objects[1] = this.removeEmptyStrings(twoLists[0].split("(\\s*,\\s*|\\s+|\\(|\\))"));
+            objects[0] = ExtractData.removeEmptyStrings(twoLists[1].split("(\\s*,\\s*|\\s+|\\(|\\))"));
+            objects[1] = ExtractData.removeEmptyStrings(twoLists[0].split("(\\s*,\\s*|\\s+|\\(|\\))"));
 
             if (objects[0].length != objects[1].length)
             {
@@ -237,7 +241,7 @@ public class ExtractData {
      */
     public String getTableName(String query) {
         Pattern pattern = Pattern.compile("(\\s*((CREATE|DROP)\\s*TABLE|INSERT\\s*INTO|UPDATE|DELETE\\s*FROM|SELECT.*FROM)\\s*|\\s*VALUES\\s*|\\s*SET.*|\\s*WHERE.*|\\s*\\(.*\\)\\s*|\\s*;\\s*$)", Pattern.CASE_INSENSITIVE);
-        String[] splitQuery = this.removeEmptyStrings(pattern.split(query));
+        String[] splitQuery = ExtractData.removeEmptyStrings(pattern.split(query));
 
         return splitQuery[0].toLowerCase();
     }
@@ -247,7 +251,7 @@ public class ExtractData {
      */
     public String getDatabaseName(String query) {
         Pattern pattern = Pattern.compile("(^\\s*(CREATE|DROP)\\s*DATABASE\\s*|\\s*;\\s*$)", Pattern.CASE_INSENSITIVE);
-        String[] splitQuery = this.removeEmptyStrings(pattern.split(query));
+        String[] splitQuery = ExtractData.removeEmptyStrings(pattern.split(query));
 
         return splitQuery[0].toLowerCase();
     }
@@ -255,14 +259,10 @@ public class ExtractData {
     /**
      * Remove empty strings from an array
      */
-    private String[] removeEmptyStrings(String[] stringsArray) {
+    static String[] removeEmptyStrings(String[] stringsArray) {
         List<String> removeEmptyElements = new ArrayList<>(Arrays.asList(stringsArray));
         removeEmptyElements.removeAll(Collections.singleton(""));
 
         return removeEmptyElements.toArray(new String[0]);
     }
-
-
-  
-
 }

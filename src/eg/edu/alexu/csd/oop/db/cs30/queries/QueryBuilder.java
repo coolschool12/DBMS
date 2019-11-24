@@ -8,7 +8,7 @@ public class QueryBuilder {
      * @return a query object based on a string
      */
     public static Query buildQuery(String query) {
-        String[] splitQuery = query.split(" ", 3);
+        String[] splitQuery = ExtractData.removeEmptyStrings(query.split(" "));
 
         // Check statement type
         if (splitQuery[0].equalsIgnoreCase("create"))

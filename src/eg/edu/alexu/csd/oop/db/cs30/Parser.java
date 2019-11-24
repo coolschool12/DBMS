@@ -10,6 +10,8 @@ public class Parser {
      * Check sql query and call appropriate function.
      */
     public boolean checkSql(String query) {
+        query = query.toLowerCase();
+
         Database database = new DataBaseGenerator();
         String[] splitQuery = query.split(" ", 3);
 
