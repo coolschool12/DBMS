@@ -202,7 +202,7 @@ public class ExtractData {
 
         if(s.toLowerCase().contains("where")){
             table.put("type","0");
-            String[] splitQuery = s.split("(UPDATE|update)\\s*|\\s*(SET|set)\\s+|(WHERE|where)\\s+|\\s*(=|<|>)\\s*|'|\\s*,\\s*");
+            String[] splitQuery = s.split("(UPDATE|update)\\s*|\\s*(SET|set)\\s+|\\s*(WHERE|where)\\s+|\\s*(=|<|>)\\s*|'|\\s*,\\s*");
 
 
             if(s.toLowerCase().contains(">")) table.put("operator" , ">");
