@@ -176,7 +176,7 @@ public class ExtractData {
         Map <String , String> table = new HashMap<>();
         table.put("type","0");
         if(s.toLowerCase().contains("where")){
-            Pattern pattern = Pattern.compile("(FROM|from)\\s*|\\s*(WHERE|where)\\s*|(=|<|>)\\s*|'", Pattern.CASE_INSENSITIVE);
+             Pattern pattern = Pattern.compile("(FROM|from)\\s*|\\s*(WHERE|where)\\s*|\\s*(=|<|>)\\s*|\\s*'\\s*", Pattern.CASE_INSENSITIVE);
             String[] splitQuery = pattern.split(s);
             if(s.toLowerCase().contains("=")) table.put("operator" , "=");
             else if(s.toLowerCase().contains(">")) table.put("operator" , ">");
@@ -202,7 +202,7 @@ public class ExtractData {
 
         if(s.toLowerCase().contains("where")){
             table.put("type","0");
-            String[] splitQuery = s.split("(UPDATE|update)\\s|(SET|set)\\s+|(WHERE|where)\\s+|(=|<|>)\\s*|'|\\s*,\\s*");
+            String[] splitQuery = s.split("(UPDATE|update)\\s*|\\s*(SET|set)\\s+|(WHERE|where)\\s+|\\s*(=|<|>)\\s*|'|\\s*,\\s*");
 
 
             if(s.toLowerCase().contains(">")) table.put("operator" , ">");
@@ -223,7 +223,7 @@ public class ExtractData {
                 table.put("type","1");
 
         }else {
-            String[] splitQuery = s.split("(UPDATE|update)\\s|\\s*=\\s*|(SET|set)\\s+|'|\\s*,\\s*");
+            String[] splitQuery = s.split("(UPDATE|update)\\s*|\\s*=\\s*|\\s*(SET|set)\\s+|'|\\s*,\\s*");
             int m =1;
             for(int j=0;j<(splitQuery.length-2);){
                 table.put("selectedColumn"+ m,splitQuery[j+2]);
