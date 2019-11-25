@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 public class ExtractData {
     /**
      * @return names of columns and values to insert in a table from a CREATE query
-     * Column 0: int objects
-     * Column 1: varchar objects
+     * Column 0: names of columns.
+     * Column 1: contains 0 for string, 1 for an int.
      */
     public Object[][] getContentsOfTableQuery(String query) {
         query = query.toLowerCase();
@@ -20,25 +20,26 @@ public class ExtractData {
         String[] tableContent =  ExtractData.removeEmptyStrings(pattern.split(query));
 
         // Extract column names from table
-        List<String> ints = new ArrayList<>();
-        List<String> varchars = new ArrayList<>();
+        List<String> values = new ArrayList<>();
+        List<Integer> whichValue = new ArrayList<>();
         for (String nameTypeString : tableContent)
         {
             String[] splitNameTypeString = nameTypeString.split("\\s+");
 
+            values.add(splitNameTypeString[0].toLowerCase());
             if (splitNameTypeString[1].equalsIgnoreCase("int"))
             {
-                ints.add(splitNameTypeString[0].toLowerCase());
+                whichValue.add(1);
             }
             else if (splitNameTypeString[1].equalsIgnoreCase("varchar"))
             {
-                varchars.add(splitNameTypeString[0].toLowerCase());
+                whichValue.add(0);
             }
         }
 
-        String[][] tableColumns = new String[2][];
-        tableColumns[0] = ints.toArray(new String[0]);
-        tableColumns[1] = varchars.toArray(new String[0]);
+        Object[][] tableColumns = new Object[2][];
+        tableColumns[0] = values.toArray(new String[0]);
+        tableColumns[1] = whichValue.toArray(new Integer[0]);
 
         return tableColumns;
     }
