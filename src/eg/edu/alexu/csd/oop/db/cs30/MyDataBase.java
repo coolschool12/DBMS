@@ -64,10 +64,7 @@ class MyDataBase {
 
     Object[][] select(HashMap<String, Object> properties) throws SQLException {
 
-        if (properties == null) throw new SQLException("OPS");
-
-        Table selectedTable = getTheDesiredTable((String) properties.get("tableName"));
-        if (selectedTable == null) throw new SQLException("NO TABLE EXIST");
+        Table selectedTable = dealWithTheHash(properties);
 
         if (properties.get("starflag").equals(1)) {
             if (properties.containsKey("operator"))
@@ -90,10 +87,7 @@ class MyDataBase {
 
     int delete(HashMap<String, Object> properties) throws SQLException {
 
-        if (properties == null) throw new SQLException("OPS");
-
-        Table selectedTable = getTheDesiredTable((String) properties.get("tableName"));
-        if (selectedTable == null) throw new SQLException("OPS!!");
+        Table selectedTable = dealWithTheHash(properties);
 
        return selectedTable.delete((String) properties.get("condColumns"),(Character) properties.get("operator"), properties.get("condValue"));
     }
@@ -101,10 +95,7 @@ class MyDataBase {
 
     int update(HashMap<String, Object> properties) throws SQLException {
 
-        if (properties == null) throw new SQLException("OPS");
-
-        Table selectedTable = getTheDesiredTable((String) properties.get("tableName"));
-        if (selectedTable == null) throw new SQLException("OPS!!");
+        Table selectedTable = dealWithTheHash(properties);
 
         String[] columnNames = (String[]) getColumnsStuff(properties, "selectedColumn");
         Object[] columnValues = getColumnsStuff(properties, "setValue");
@@ -144,5 +135,14 @@ class MyDataBase {
                columnsStuff.add(properties.get(val + i));
 
            return columnsStuff.toArray(new Object[0]);
+    }
+
+    private Table dealWithTheHash(HashMap<String, Object> properties) throws SQLException {
+        if (properties == null) throw new SQLException("OPS");
+
+        Table selectedTable = getTheDesiredTable((String) properties.get("tableName"));
+        if (selectedTable == null) throw new SQLException("NO TABLE EXIST");
+
+        return selectedTable;
     }
 }
