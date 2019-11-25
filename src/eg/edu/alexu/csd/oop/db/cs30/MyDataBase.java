@@ -38,7 +38,13 @@ class MyDataBase {
     {
         Table desiredTable = getTheDesiredTable(tableName);
 
-        return desiredTable != null;
+        if (desiredTable == null)
+            return false;
+
+        else
+            tables.remove(desiredTable);
+
+        return true;
 
     }
 
@@ -57,6 +63,8 @@ class MyDataBase {
     }
 
     Object[][] select(HashMap<String, Object> properties) throws SQLException {
+
+        if (properties == null) throw new SQLException("OPS");
 
         Table selectedTable = getTheDesiredTable((String) properties.get("tableName"));
         if (selectedTable == null) throw new SQLException("NO TABLE EXIST");
@@ -82,13 +90,18 @@ class MyDataBase {
 
     int delete(HashMap<String, Object> properties) throws SQLException {
 
+        if (properties == null) throw new SQLException("OPS");
+
         Table selectedTable = getTheDesiredTable((String) properties.get("tableName"));
         if (selectedTable == null) throw new SQLException("OPS!!");
 
        return selectedTable.delete((String) properties.get("condColumns"),(Character) properties.get("operator"), properties.get("condValue"));
     }
 
+
     int update(HashMap<String, Object> properties) throws SQLException {
+
+        if (properties == null) throw new SQLException("OPS");
 
         Table selectedTable = getTheDesiredTable((String) properties.get("tableName"));
         if (selectedTable == null) throw new SQLException("OPS!!");
