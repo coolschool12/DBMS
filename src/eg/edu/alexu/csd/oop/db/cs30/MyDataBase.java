@@ -68,16 +68,16 @@ class MyDataBase {
 
         if (properties.get("starflag").equals(1)) {
             if (properties.containsKey("operator"))
-                return selectedTable.select((String) properties.get("condColumns"), (Character) properties.get("operator"), properties.get("condValue"));
+                return selectedTable.select((String) properties.get("condColumns"), ((String) properties.get("operator")).charAt(0), properties.get("condValue"));
 
             else
                 return selectedTable.select();
         }
         else {
-            String[] columnNames = (String[]) getColumnsStuff(properties, "selectedColumn");
+            String[] columnNames = toStringArray(getColumnsStuff(properties, "selectedColumn"));
 
             if (properties.containsKey("operator"))
-                return  selectedTable.select(columnNames,(String) properties.get("condColumns"),(Character) properties.get("operator"), properties.get("condValue"));
+                return  selectedTable.select(columnNames,(String) properties.get("condColumns"),((String) properties.get("operator")).charAt(0), properties.get("condValue"));
 
             else
                 return selectedTable.select(columnNames);
@@ -89,7 +89,7 @@ class MyDataBase {
 
         Table selectedTable = dealWithTheHash(properties);
 
-       return selectedTable.delete((String) properties.get("condColumns"),(Character) properties.get("operator"), properties.get("condValue"));
+       return selectedTable.delete((String) properties.get("condColumns"),((String) properties.get("operator")).charAt(0), properties.get("condValue"));
     }
 
 
@@ -97,11 +97,11 @@ class MyDataBase {
 
         Table selectedTable = dealWithTheHash(properties);
 
-        String[] columnNames = (String[]) getColumnsStuff(properties, "selectedColumn");
+        String[] columnNames = toStringArray(getColumnsStuff(properties, "selectedColumn"));
         Object[] columnValues = getColumnsStuff(properties, "setValue");
 
         if (properties.containsKey("operator"))
-            return selectedTable.update(columnNames, columnValues,(String) properties.get("condColumns"),(Character) properties.get("operator"), properties.get("condValue"));
+            return selectedTable.update(columnNames, columnValues,(String) properties.get("condColumns"),((String) properties.get("operator")).charAt(0), properties.get("condValue"));
 
         else
             return selectedTable.update(columnNames, columnValues);
@@ -129,7 +129,7 @@ class MyDataBase {
     private Object[] getColumnsStuff(HashMap<String, Object> properties, String val)
     {
            ArrayList<Object> columnsStuff = new ArrayList<>();
-           long size = (long) properties.get("sizeOfSelectedColoumns");
+           long size = (Integer) properties.get("sizeOfSelectedColoumns");
 
            for (long i = 1; i <= size; i++)
                columnsStuff.add(properties.get(val + i));
@@ -144,5 +144,17 @@ class MyDataBase {
         if (selectedTable == null) throw new SQLException("NO TABLE EXIST");
 
         return selectedTable;
+    }
+
+    private String[] toStringArray(Object[] values)
+    {
+        ArrayList<String> stringValues = new ArrayList<>();
+
+        for (Object val : values)
+        {
+            stringValues.add((String) val);
+        }
+
+        return stringValues.toArray(new String[0]);
     }
 }
