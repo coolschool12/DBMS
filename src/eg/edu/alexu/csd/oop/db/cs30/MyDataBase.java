@@ -17,19 +17,9 @@ class MyDataBase {
 
     boolean addTable(Object[][] Data, String tableName)
     {
-        ArrayList<String> ColumnsNames = new ArrayList<>();
-        ArrayList<Integer> ColumnsTypes = new ArrayList<>();
-
-        for (int i = 0; i < 2 ; i++)
-            for (int j = 0; j < Data[i].length; j++) {
-                ColumnsNames.add((String) Data[i][j]);
-                ColumnsTypes.add(1 - i);
-            }
-
-        Table newTable = new Table(ColumnsNames.toArray(new String[0]), ColumnsTypes.toArray(new Integer[0]));
+        Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
         newTable.setTableName(tableName);
         tables.add(newTable);
-
         return true;
 
     }

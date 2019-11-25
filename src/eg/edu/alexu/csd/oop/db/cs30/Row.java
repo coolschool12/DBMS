@@ -3,7 +3,7 @@ package eg.edu.alexu.csd.oop.db.cs30;
 import java.util.HashMap;
 
 public class Row {
-    private HashMap<String,Object> map=new HashMap<>();
+    private HashMap<String,Object> map = new HashMap<>();
 
     /**
      *
