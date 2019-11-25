@@ -70,7 +70,7 @@ public class DataBaseGenerator implements Database {
             throw new SQLException("THERE IS NO AN ACTIVE DATABASE!!!");
 
         if (exp.isCorrect(query) && exp.getId() == 7)
-            return activeDataBase.select((HashMap<String, String>) extractData.SelectedProperties(query));
+            return activeDataBase.select((HashMap<String, Object>) extractData.SelectedProperties(query));
         else
             throw new SQLException("OPS!!");
     }
@@ -88,10 +88,10 @@ public class DataBaseGenerator implements Database {
             return activeDataBase.editTable(extractData.getObjectsToInsert(query), extractData.getTableName(query));
 
         else if (exp.getId() == 5)
-            return activeDataBase.delete((HashMap<String, String>) extractData.DeleteProperties(query));
+            return activeDataBase.delete((HashMap<String, Object>) extractData.DeleteProperties(query));
 
         else if (exp.getId() == 6)
-            return activeDataBase.update((HashMap<String, String>) extractData.UpadteProperties(query));
+            return activeDataBase.update((HashMap<String, Object>) extractData.UpadteProperties(query));
 
         else
             throw new SQLException("OPS!!");

@@ -56,14 +56,14 @@ class MyDataBase {
         }
     }
 
-    Object[][] select(HashMap<String, String> properties) throws SQLException {
+    Object[][] select(HashMap<String, Object> properties) throws SQLException {
 
-        Table selectedTable = getTheDesiredTable(properties.get("tableName"));
+        Table selectedTable = getTheDesiredTable((String) properties.get("tableName"));
         if (selectedTable == null) throw new SQLException("NO TABLE EXIST");
 
-        if (properties.get("starflag").equals("1")) {
+        if (properties.get("starflag").equals(1)) {
             if (properties.containsKey("operator"))
-                return selectedTable.select(properties.get("condColumns"), properties.get("operator").toCharArray()[0], properties.get("condValue"));
+                return selectedTable.select((String) properties.get("condColumns"), (Character) properties.get("operator"), properties.get("condValue"));
 
             else
                 return selectedTable.select();
@@ -72,7 +72,7 @@ class MyDataBase {
             String[] columnNames = (String[]) getColumnsStuff(properties, "selectedColumn");
 
             if (properties.containsKey("operator"))
-                return selectedTable.select(columnNames, properties.get("condColumns"), properties.get("operator").toCharArray()[0], properties.get("condValue"));
+                return  selectedTable.select(columnNames,(String) properties.get("condColumns"),(Character) properties.get("operator"), properties.get("condValue"));
 
             else
                 return selectedTable.select(columnNames);
@@ -80,24 +80,24 @@ class MyDataBase {
 
     }
 
-    int delete(HashMap<String, String> properties) throws SQLException {
+    int delete(HashMap<String, Object> properties) throws SQLException {
 
-        Table selectedTable = getTheDesiredTable(properties.get("tableName"));
+        Table selectedTable = getTheDesiredTable((String) properties.get("tableName"));
         if (selectedTable == null) throw new SQLException("OPS!!");
 
-       return selectedTable.delete(properties.get("condColumns"), properties.get("operator").toCharArray()[0], properties.get("condValue"));
+       return selectedTable.delete((String) properties.get("condColumns"),(Character) properties.get("operator"), properties.get("condValue"));
     }
 
-    int update(HashMap<String, String> properties) throws SQLException {
+    int update(HashMap<String, Object> properties) throws SQLException {
 
-        Table selectedTable = getTheDesiredTable(properties.get("tableName"));
+        Table selectedTable = getTheDesiredTable((String) properties.get("tableName"));
         if (selectedTable == null) throw new SQLException("OPS!!");
 
         String[] columnNames = (String[]) getColumnsStuff(properties, "selectedColumn");
         Object[] columnValues = getColumnsStuff(properties, "setValue");
 
         if (properties.containsKey("operator"))
-            return selectedTable.update(columnNames, columnValues, properties.get("condColumns"), properties.get("operator").toCharArray()[0], properties.get("condValue"));
+            return selectedTable.update(columnNames, columnValues,(String) properties.get("condColumns"),(Character) properties.get("operator"), properties.get("condValue"));
 
         else
             return selectedTable.update(columnNames, columnValues);
@@ -122,14 +122,14 @@ class MyDataBase {
         return null;
     }
 
-    private Object[] getColumnsStuff(HashMap<String, String> properties, String val)
+    private Object[] getColumnsStuff(HashMap<String, Object> properties, String val)
     {
-           ArrayList<String> columnsStuff = new ArrayList<>();
-           long size = Integer.parseInt(properties.get("sizeOfSelectedColoumns"));
+           ArrayList<Object> columnsStuff = new ArrayList<>();
+           long size = (long) properties.get("sizeOfSelectedColoumns");
 
            for (long i = 1; i <= size; i++)
                columnsStuff.add(properties.get(val + i));
 
-           return columnsStuff.toArray(new String[0]);
+           return columnsStuff.toArray(new Object[0]);
     }
 }
