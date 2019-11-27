@@ -1,5 +1,6 @@
 package eg.edu.alexu.csd.oop.db.cs30;
 
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
@@ -9,14 +10,19 @@ public class Table {
     private ArrayList<Row> rows;
     private String tableName;
     //specify column names and types
-    public Table (String[] columnNames,Integer[] columnTypes){
+    public Table (String[] columnNames,Integer[] columnTypes) throws SQLException {
         rows=new ArrayList<Row>();
         this.columnNames=columnNames;
         for(int i=0;i<columnNames.length;i++){
             map.put(columnNames[i],columnTypes[i]);
         }
+        if(columnNames.length!=map.size()){
+            throw new SQLException("Dublication in columns names");
+        }
     }
-
+    public HashMap<String,Integer> getMap(){
+        return map;
+    }
     public String getTableName() {
         return tableName;
     }
