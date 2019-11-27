@@ -71,6 +71,23 @@ public class TableFactory {
         }
     }
 
+    public static boolean delete(String filePath) {
+
+        File file = new File(filePath);
+
+        if (file.isDirectory())
+        {
+            String[] files = file.list();
+            if (files != null) {
+                for (String url : files) {
+                    File nestedFile = new File(file.getPath(), url);
+                    nestedFile.delete();
+                }
+            }
+        }
+        return file.delete();
+    }
+
     /**
      * Create database schema
      */

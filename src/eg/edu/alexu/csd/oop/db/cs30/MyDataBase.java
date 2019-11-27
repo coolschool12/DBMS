@@ -1,7 +1,9 @@
 package eg.edu.alexu.csd.oop.db.cs30;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 class MyDataBase {
@@ -10,18 +12,21 @@ class MyDataBase {
     private String path;
    // private Table activeTable;
 
-    MyDataBase(String name)
-    {
+    MyDataBase(String name, String dataBasePath) throws SQLException {
       //  activeTable = null;
+
+        path = dataBasePath + "/" + name;
+        tables = (ArrayList<String>) Arrays.asList(TableFactory.readDatabaseSchema(dataBasePath + "/" + name + ".xsd"));
         this.name = name;
-        tables = new ArrayList<>();
+        makeDataBaseFolder();
+
     }
 
     boolean addTable(Object[][] Data, String tableName) throws SQLException
     {
 
         Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
-        TableFactory.createTable(getPath(), getPath(), (String[]) Data[0], (Integer[]) Data[1], tableName);
+        TableFactory.createTable(getPath(),tableName , (String[]) Data[0], (Integer[]) Data[1]);
         newTable.setTableName(tableName);
         tables.add(tableName);
         return true;
@@ -33,10 +38,13 @@ class MyDataBase {
         if (desiredTable == null)
             return false;
 
-        else
+        else {
+            boolean deleteTable = TableFactory.delete(this.getPath() + "/" + desiredTable.getTableName() + ".xml");
+            boolean deleteScheme = TableFactory.delete(this.getPath() + "/" + desiredTable.getTableName() + ".xsd");
             tables.remove(desiredTable.getTableName());
+            return deleteTable && deleteScheme;
+        }
 
-        return true;
 
     }
 
@@ -111,8 +119,8 @@ class MyDataBase {
         for (String table : tables)
         {
             if (table.equals(tableName)) {
-                return TableFactory.loadTable(this.getPath() + "\\" + tableName + ".xml",
-                        this.getPath() + "\\" + tableName + ".xsd");
+                return TableFactory.loadTable(this.getPath() + "/" + tableName + ".xml",
+                        this.getPath() + "/" + tableName + ".xsd");
             }
         }
         return null;
@@ -148,5 +156,13 @@ class MyDataBase {
         }
 
         return stringValues.toArray(new String[0]);
+    }
+
+    private void makeDataBaseFolder() throws SQLException {
+        File file = new File(this.path);
+
+        if (!file.mkdir())
+            throw new SQLException("Theres Another Folder with the Same Name");
+
     }
 }
