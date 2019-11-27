@@ -14,7 +14,7 @@ public class DataBaseGenerator implements Database {
     private ArrayList<MyDataBase> dataBases;
     private MyDataBase activeDataBase;
     private ExtractData extractData;
-    private String pathToDatabases = "databases" + ((int)(Math.random() * 100));
+    private String pathToDatabases = "databases" + System.getProperty("file.separator") + ((int)(Math.random() * 100));
 
     DataBaseGenerator()
     {
