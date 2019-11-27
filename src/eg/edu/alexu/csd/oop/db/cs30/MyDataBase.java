@@ -12,10 +12,10 @@ class MyDataBase {
 
     MyDataBase(String name, String dataBasePath) throws SQLException {
 
-        path = dataBasePath + "/" + name;
+        path = dataBasePath + System.getProperty("file.separator") + name;
         this.name = name;
         makeDataBaseFolder(path);
-        tables = TableFactory.readDatabaseSchema(path + "/" + name + ".xsd");
+        tables = TableFactory.readDatabaseSchema(path + System.getProperty("file.separator") + name + ".xsd");
     }
 
     boolean addTable(Object[][] Data, String tableName) throws SQLException
@@ -34,10 +34,10 @@ class MyDataBase {
             return false;
 
         else {
-            boolean deleteTable = TableFactory.delete(this.getPath() + "/" + desiredTable.getTableName() + ".xml");
-            boolean deleteScheme = TableFactory.delete(this.getPath() + "/" + desiredTable.getTableName() + ".xsd");
+            boolean deleteTable = TableFactory.delete(this.getPath() + System.getProperty("file.separator") + desiredTable.getTableName() + ".xml");
+            boolean deleteScheme = TableFactory.delete(this.getPath() + System.getProperty("file.separator") + desiredTable.getTableName() + ".xsd");
             tables.remove(desiredTable.getTableName());
-            TableFactory.createDatabaseSchema(tables.toArray(new String[0]), path + "/" + name + ".xsd");
+            TableFactory.createDatabaseSchema(tables.toArray(new String[0]), path + System.getProperty("file.separator") + name + ".xsd");
             return deleteTable && deleteScheme;
         }
     }
@@ -127,8 +127,8 @@ class MyDataBase {
         for (String table : tables)
         {
             if (table.equals(tableName)) {
-                return TableFactory.loadTable(this.getPath() + "/" + tableName + ".xml",
-                        this.getPath() + "/" + tableName + ".xsd");
+                return TableFactory.loadTable(this.getPath() + System.getProperty("file.separator") + tableName + ".xml",
+                        this.getPath() + System.getProperty("file.separator") + tableName + ".xsd");
             }
         }
         return null;
@@ -170,7 +170,7 @@ class MyDataBase {
         File file = new File(this.path);
 
         if (file.mkdir())
-            TableFactory.createDatabaseSchema(new String[0], dataBasePath + "/" + name + ".xsd");
+            TableFactory.createDatabaseSchema(new String[0], dataBasePath + System.getProperty("file.separator") + name + ".xsd");
 
     }
 }

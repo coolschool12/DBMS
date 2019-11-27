@@ -23,7 +23,7 @@ import java.util.Map;
 public class TableFactory {
 
     public static void createTable(String databasePath, String tableName, String[] columnNames, Integer[] columnTypes) throws SQLException {
-        createTableSchema(databasePath+"/"+tableName+".xsd", columnNames, columnTypes);
+        createTableSchema(databasePath+System.getProperty("file.separator")+tableName+".xsd", columnNames, columnTypes);
 
         // Create empty file
         try {
@@ -34,7 +34,7 @@ public class TableFactory {
             Element element = xmlDocument.createElement("rows");
             xmlDocument.appendChild(element);
 
-            writeToFile(databasePath+"/"+tableName+".xml", xmlDocument);
+            writeToFile(databasePath+System.getProperty("file.separator")+tableName+".xml", xmlDocument);
         }
         catch (Exception e) {
             throw new SQLException();
@@ -61,9 +61,9 @@ public class TableFactory {
             saveCellstoXml(table, doc);
 
             // send all the stuff to the transformer so it can transform the doc object to the file with that path
-            writeToFile(tablePath  + "\\" + table.getTableName() + ".xml", doc);
+            writeToFile(tablePath  + System.getProperty("file.separator") + table.getTableName() + ".xml", doc);
 
-            createTableSchema(tablePath  + "\\" + table.getTableName() + ".xsd",  table.getColumnNames(), table.getColumnTypes());
+            createTableSchema(tablePath  + System.getProperty("file.separator") + table.getTableName() + ".xsd",  table.getColumnNames(), table.getColumnTypes());
 
         } catch (ParserConfigurationException | TransformerException e) {
 
@@ -270,7 +270,7 @@ public class TableFactory {
         }
 
         // Get table name
-        String[] splitPath = path.replaceAll(".xsd", "").split("/");
+        String[] splitPath = path.replaceAll(".xsd", "").split(System.getProperty("file.separator"));
 
         table = new Table(columnNames.toArray(new String[0]), columnTypes.toArray(new Integer[0]));
         table.setTableName(splitPath[splitPath.length - 1]);
