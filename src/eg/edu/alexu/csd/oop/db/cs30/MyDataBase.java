@@ -60,7 +60,14 @@ class MyDataBase {
         {
             Object[] values = newContent[0];
             String[] columnNames = (String[]) newContent[1];
-            int x =  desiredTable.insertRow(columnNames, values);
+            int x;
+
+            if (columnNames != null)
+                x = desiredTable.insertRow(columnNames, values);
+
+            else
+                x = desiredTable.insertRow(values);
+
             TableFactory.saveTable(this.getPath(), desiredTable);
             return x;
         }
@@ -96,11 +103,15 @@ class MyDataBase {
     int delete(HashMap<String, Object> properties) throws SQLException {
 
         Table selectedTable = dealWithTheHash(properties);
+        int x;
+        if (properties.containsKey("operator"))
+            x = selectedTable.delete((String) properties.get("condColumns"),((String) properties.get("operator")).charAt(0), properties.get("condValue"));
 
-       int x = selectedTable.delete((String) properties.get("condColumns"),((String) properties.get("operator")).charAt(0), properties.get("condValue"));
-       TableFactory.saveTable(this.getPath(), selectedTable);
+        else
+            x = selectedTable.delete();
 
-       return x;
+        TableFactory.saveTable(this.getPath(), selectedTable);
+        return x;
     }
 
 
