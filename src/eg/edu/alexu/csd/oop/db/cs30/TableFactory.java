@@ -11,16 +11,27 @@ import java.util.List;
 import java.util.Map;
 
 public class TableFactory {
+
+    public static void createTable(String tablePath,String schemaPath,String[] columnNames,Integer[] columnTypes,String tableName){
+
+    }
+    public static Table loadTable(String tablePath,String schemaPath){
+        return null;
+    }
+    public static void saveTable(String tablePath,Table table){
+
+    }
+
     /**
      * Create table schema.
      */
-    public static void createTableSchema(String path) {
+    private static void createTableSchema(String path) {
     }
 
     /**
      * Load an xml table.
      */
-    public static Table load(Table table,String pathName) throws SQLException{
+    private static Table load(Table table,String pathName) throws SQLException{
         File xmlFile =new File(pathName);
         DocumentBuilderFactory factory= DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
@@ -53,7 +64,7 @@ public class TableFactory {
     /**
      * @return Table containing data taken from a schema file.
      */
-    public static Table loadSchema(String path) throws SQLException {
+    private static Table loadSchema(String path) throws SQLException {
         Table table;
         List<String> columnNames = new ArrayList<>();
         List<Integer> columnTypes = new ArrayList<>();
@@ -109,7 +120,7 @@ public class TableFactory {
      *      0: column names.
      *      1: values of objects.
      */
-    public static Object[][] parser(List<String> columnNames, List<String> values, Map<String, Integer> columnType) throws SQLException {
+    private static Object[][] parser(List<String> columnNames, List<String> values, Map<String, Integer> columnType) throws SQLException {
         Object[] objectValues = new Object[columnNames.size()];
 
         // Parse data
