@@ -19,10 +19,33 @@ public class TableFactory {
 
     public static void createTable(String tablePath,String schemaPath,String[] columnNames,Integer[] columnTypes,String tableName) throws SQLException {
         createTableSchema(schemaPath, columnNames, columnTypes);
+
+        // Create empty file
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document xmlDocument = documentBuilder.newDocument();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+
+            DOMSource domSource = new DOMSource(xmlDocument);
+            StreamResult streamResult = new StreamResult(new File(tablePath));
+
+            transformer.transform(domSource, streamResult);
+        }
+        catch (Exception e) {
+            throw new SQLException();
+        }
     }
-    public static Table loadTable(String tablePath,String schemaPath){
-        return null;
+
+    /**
+     * Load a table from xml
+     */
+    public static Table loadTable(String tablePath,String schemaPath) throws SQLException {
+        Table table = loadSchema(schemaPath);
+        return load(table, tablePath);
     }
+
     public static void saveTable(String tablePath,Table table){
 
     }
