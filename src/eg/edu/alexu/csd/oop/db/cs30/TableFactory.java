@@ -31,6 +31,9 @@ public class TableFactory {
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             Document xmlDocument = documentBuilder.newDocument();
 
+            Element element = xmlDocument.createElement("rows");
+            xmlDocument.appendChild(element);
+
             writeToFile(databasePath+"/"+tableName+".xml", xmlDocument);
         }
         catch (Exception e) {
