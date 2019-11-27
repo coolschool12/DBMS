@@ -17,11 +17,12 @@ class MyDataBase {
 
     boolean addTable(Object[][] Data, String tableName) throws SQLException
     {
+
         Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
+        //TableFactory.createTable(getPath(), getPath(), );
         newTable.setTableName(tableName);
         tables.add(newTable);
         return true;
-
     }
 
     boolean removeTable(String tableName)

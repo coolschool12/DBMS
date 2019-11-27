@@ -15,6 +15,7 @@ public class Row {
         for(int i=0;i<columnNames.length;i++){
             map.put(columnNames[i],values[i]);
         }
+
     }
     public Object[] getRow(String[] columnNames){
         Object[] result=new Object[columnNames.length];

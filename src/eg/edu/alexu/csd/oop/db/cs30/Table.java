@@ -23,8 +23,13 @@ public class Table {
     public HashMap<String,Integer> getMap(){
         return map;
     }
+
     public String getTableName() {
         return tableName;
+    }
+
+    public String[] getColumnNames() {
+        return columnNames;
     }
 
     public void setTableName(String tableName) {

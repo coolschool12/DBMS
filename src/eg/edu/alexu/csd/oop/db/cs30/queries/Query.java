@@ -7,11 +7,11 @@ public interface Query {
     /**
      * Validate query
      */
-    public boolean isCorrect(String query);
+    boolean isCorrect(String query);
 
     /**
      * @return query's id
      *      0: create database, 1: create table, 2: drop database, 3: drop table, 4: insert, 5: Delete, 6: Update, 7: select
      */
-    public int getId();
+    int getId();
 }

@@ -2,8 +2,13 @@ package eg.edu.alexu.csd.oop.db.cs30;
 
 import org.w3c.dom.*;
 
+import javax.print.Doc;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,20 +17,100 @@ import java.util.Map;
 
 public class TableFactory {
 
-    public static void createTable(String tablePath,String schemaPath,String[] columnNames,Integer[] columnTypes,String tableName){
+    public static void createTable(String tablePath,String schemaPath,String[] columnNames,Integer[] columnTypes,String tableName) throws SQLException {
+        createTableSchema(schemaPath, columnNames, columnTypes);
 
-    }
-    public static Table loadTable(String tablePath,String schemaPath){
-        return null;
-    }
-    public static void saveTable(String tablePath,Table table){
+        // Create empty file
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document xmlDocument = documentBuilder.newDocument();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
 
+            DOMSource domSource = new DOMSource(xmlDocument);
+            StreamResult streamResult = new StreamResult(new File(tablePath));
+
+            transformer.transform(domSource, streamResult);
+        }
+        catch (Exception e) {
+            throw new SQLException();
+        }
+    }
+
+    /**
+     * Load a table from xml
+     */
+    public static Table loadTable(String tablePath,String schemaPath) throws SQLException {
+        Table table = loadSchema(schemaPath);
+        return load(table, tablePath);
+    }
+
+
+
+    public static void saveTable(String tablePath, Table table) throws SQLException{
+
+        try{
+            // load the Document Builder and return a document
+            Document doc = loadDocument();
+
+            // load all the data from the table and put it in nodes in the doc object
+            saveCellstoXml(table, doc);
+
+            // send all the stuff to the transformer so it can transform the doc object to the file with that path
+            writeToFile(tablePath, doc);
+
+        } catch (ParserConfigurationException | TransformerException e) {
+
+            throw new SQLException("CANT SAVE THAT FILE!!!!!!");
+        }
     }
 
     /**
      * Create table schema.
      */
-    private static void createTableSchema(String path) {
+    private static void createTableSchema(String schemaPath, String[] columnNames, Integer[] columnTypes) throws SQLException {
+        File file = new File(schemaPath);
+
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document xmlDocument = documentBuilder.newDocument();
+
+            Element root = xmlDocument.createElement("schema");
+            xmlDocument.appendChild(root);
+
+            for (int i = 0, columns = columnNames.length; i < columns; i++)
+            {
+                // Create element and attributes
+                Element columnElement = xmlDocument.createElement("element");
+                columnElement.setAttribute("name", columnNames[i]);
+
+                if (columnTypes[i] == 0)
+                {
+                    columnElement.setAttribute("type", "string");
+                }
+                else
+                {
+                    columnElement.setAttribute("type", "integer");
+                }
+
+                root.appendChild(columnElement);
+            }
+
+            // Write to file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+            DOMSource domSource = new DOMSource(xmlDocument);
+            StreamResult streamResult = new StreamResult(new File(schemaPath));
+
+            transformer.transform(domSource, streamResult);
+        }
+        catch (Exception e) {
+            throw new SQLException("Error creating xsd schema");
+        }
     }
 
     /**
@@ -102,7 +187,7 @@ public class TableFactory {
             }
         }
         catch (Exception e) {
-            throw new SQLException();
+            throw new SQLException("Error while loading schema");
         }
 
         // Get table name
@@ -148,6 +233,47 @@ public class TableFactory {
         parsedValues[1] = objectValues;
 
         return parsedValues;
+    }
+
+    private static Document loadDocument() throws ParserConfigurationException {
+
+
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+
+        return documentBuilder.newDocument();
+    }
+
+    private static void saveCellstoXml(Table table, Document doc)
+    {
+        Element rootElement = doc.createElement("rows");
+        doc.appendChild(rootElement);
+
+        Object[][] valuesOfTheTable = table.select();
+        String[] tableColumnNames = table.getColumnNames();
+
+        for (Object[] objects : valuesOfTheTable) {
+            Element row = doc.createElement("row");
+            for (int i = 0; i < objects.length; i++) {
+                if (objects[i] != null) {
+
+                    Element cell = doc.createElement(tableColumnNames[i]);
+                    cell.appendChild(doc.createTextNode((String) objects[i]));
+                    row.appendChild(cell);
+                }
+            }
+        }
+    }
+
+    private static void writeToFile(String xmlPath, Document document) throws TransformerException {
+
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+
+        DOMSource domSource = new DOMSource(document);
+        StreamResult streamResult = new StreamResult(new File(xmlPath));
+
+        transformer.transform(domSource, streamResult);
     }
 }
 
