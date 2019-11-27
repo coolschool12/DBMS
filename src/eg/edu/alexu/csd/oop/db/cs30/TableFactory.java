@@ -270,10 +270,8 @@ public class TableFactory {
         }
 
         // Get table name
-        String[] splitPath = path.replaceAll(".xsd", "").split(System.getProperty("file.separator"));
-
         table = new Table(columnNames.toArray(new String[0]), columnTypes.toArray(new Integer[0]));
-        table.setTableName(splitPath[splitPath.length - 1]);
+        table.setTableName(file.getName().replaceAll(".xsd", ""));
 
         return table;
     }
