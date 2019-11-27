@@ -4,6 +4,11 @@ import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,8 +17,8 @@ import java.util.Map;
 
 public class TableFactory {
 
-    public static void createTable(String tablePath,String schemaPath,String[] columnNames,Integer[] columnTypes,String tableName){
-
+    public static void createTable(String tablePath,String schemaPath,String[] columnNames,Integer[] columnTypes,String tableName) throws SQLException {
+        createTableSchema(schemaPath, columnNames, columnTypes);
     }
     public static Table loadTable(String tablePath,String schemaPath){
         return null;
@@ -25,7 +30,48 @@ public class TableFactory {
     /**
      * Create table schema.
      */
-    private static void createTableSchema(String path) {
+    private static void createTableSchema(String schemaPath, String[] columnNames, Integer[] columnTypes) throws SQLException {
+        File file = new File(schemaPath);
+
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document xmlDocument = documentBuilder.newDocument();
+
+            Element root = xmlDocument.createElement("schema");
+            xmlDocument.appendChild(root);
+
+            for (int i = 0, columns = columnNames.length; i < columns; i++)
+            {
+                // Create element and attributes
+                Element columnElement = xmlDocument.createElement("element");
+                columnElement.setAttribute("name", columnNames[i]);
+
+                if (columnTypes[i] == 0)
+                {
+                    columnElement.setAttribute("type", "string");
+                }
+                else
+                {
+                    columnElement.setAttribute("type", "integer");
+                }
+
+                root.appendChild(columnElement);
+            }
+
+            // Write to file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+            DOMSource domSource = new DOMSource(xmlDocument);
+            StreamResult streamResult = new StreamResult(new File(schemaPath));
+
+            transformer.transform(domSource, streamResult);
+        }
+        catch (Exception e) {
+            throw new SQLException("Error creating xsd schema");
+        }
     }
 
     /**
@@ -102,7 +148,7 @@ public class TableFactory {
             }
         }
         catch (Exception e) {
-            throw new SQLException();
+            throw new SQLException("Error while loading schema");
         }
 
         // Get table name
