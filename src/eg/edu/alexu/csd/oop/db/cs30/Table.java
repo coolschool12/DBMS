@@ -104,6 +104,12 @@ public class Table {
         }
         return counter;
     }
+    public int delete(){
+        int size=rows.size();
+        for(int i=0;i<size;i++)
+            rows.remove(0);
+        return size;
+    }
     // update some of columns(columnNames) with certain (values) for some rows (rows selection depend on the condition)
     public int update(String[] columnNames,Object[] values,String ColumnName,char Operator,Object value) throws RuntimeException{
         this.checkCondition(ColumnName,value);
