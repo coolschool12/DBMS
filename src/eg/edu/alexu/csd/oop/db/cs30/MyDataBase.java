@@ -25,9 +25,9 @@ class MyDataBase {
     boolean addTable(Object[][] Data, String tableName) throws SQLException
     {
 
-        Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
+        //Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
         TableFactory.createTable(getPath(),tableName , (String[]) Data[0], (Integer[]) Data[1]);
-        newTable.setTableName(tableName);
+        //newTable.setTableName(tableName);
         tables.add(tableName);
         return true;
     }

@@ -14,6 +14,8 @@ public class DataBaseGenerator implements Database {
     private ArrayList<MyDataBase> dataBases;
     private MyDataBase activeDataBase;
     private ExtractData extractData;
+    private String pathToDatabases = "databases";
+
     DataBaseGenerator()
     {
         extractData = new ExtractData();
@@ -117,7 +119,7 @@ public class DataBaseGenerator implements Database {
         }
         else if (exp.getId() == 0) {
             if (!isFound) {
-                activeDataBase = new MyDataBase(dataBaseName);
+                activeDataBase = new MyDataBase(dataBaseName, pathToDatabases+"/"+dataBaseName);
                 dataBases.add(activeDataBase);
                 return true;
             }

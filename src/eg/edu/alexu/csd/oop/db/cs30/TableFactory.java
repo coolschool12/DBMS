@@ -30,13 +30,8 @@ public class TableFactory {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             Document xmlDocument = documentBuilder.newDocument();
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
 
-            DOMSource domSource = new DOMSource(xmlDocument);
-            StreamResult streamResult = new StreamResult(new File(databasePath+"/"+tableName+".xml"));
-
-            transformer.transform(domSource, streamResult);
+            writeToFile(databasePath+"/"+tableName+".xml", xmlDocument);
         }
         catch (Exception e) {
             throw new SQLException();
@@ -109,14 +104,7 @@ public class TableFactory {
             }
 
             // Write to file
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-            DOMSource domSource = new DOMSource(xmlDocument);
-            StreamResult streamResult = new StreamResult(new File(databaseSchemaPath));
-
-            transformer.transform(domSource, streamResult);
+            writeToFile(databaseSchemaPath, xmlDocument);
         }
         catch (Exception e) {
             throw new SQLException();
