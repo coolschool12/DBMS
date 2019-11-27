@@ -114,10 +114,10 @@ public class TableFactory {
     /**
      * Read database schema
      */
-    public static String[] readDatabaseSchema(String schemaPath) throws SQLException {
+    public static ArrayList<String> readDatabaseSchema(String schemaPath) throws SQLException {
         File file = new File(schemaPath);
 
-        List<String> tableNames = new ArrayList<>();
+        ArrayList<String> tableNames = new ArrayList<>();
 
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -139,7 +139,7 @@ public class TableFactory {
             throw new SQLException("Error while loading schema");
         }
 
-        return tableNames.toArray(new String[0]);
+        return tableNames;
     }
 
     /**

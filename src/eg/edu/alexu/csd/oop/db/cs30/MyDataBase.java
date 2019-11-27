@@ -15,8 +15,8 @@ class MyDataBase {
 
         path = dataBasePath + "/" + name;
         this.name = name;
-        makeDataBaseFolder(dataBasePath);
-        tables = (ArrayList<String>) Arrays.asList(TableFactory.readDatabaseSchema(dataBasePath + "/" + name + ".xsd"));
+        makeDataBaseFolder(path);
+        tables = TableFactory.readDatabaseSchema(path + "/" + name + ".xsd");
     }
 
     boolean addTable(Object[][] Data, String tableName) throws SQLException
