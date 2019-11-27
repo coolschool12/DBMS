@@ -25,10 +25,13 @@ class MyDataBase {
 
     boolean addTable(Object[][] Data, String tableName) throws SQLException
     {
+        if (checkTable(tableName)) return false;
+
         Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
         TableFactory.createTable(getPath(),tableName , (String[]) Data[0], (Integer[]) Data[1]);
         tables.add(tableName);
         TableFactory.saveTable(this.getPath(), newTable);
+
         return true;
     }
 
@@ -174,5 +177,16 @@ class MyDataBase {
     private void makeDataBaseFolder() {
         File file = new File(this.path);
         file.mkdirs();
+    }
+
+    private boolean checkTable(String tableName)
+    {
+        for (String table : tables)
+        {
+            if (table.equals(tableName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
