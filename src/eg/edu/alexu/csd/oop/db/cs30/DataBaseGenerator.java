@@ -147,7 +147,7 @@ public class DataBaseGenerator implements Database {
     {
         boolean flag = false;
         for (MyDataBase dataBase : dataBases) {
-            if (dataBase.getName().equals(databaseName)) {
+            if (dataBase.getName().equalsIgnoreCase(databaseName)) {
                flag = true;
                activeDataBase = dataBase;
                break;
