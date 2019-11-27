@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 class MyDataBase {
-    private ArrayList<Table>tables;
+    private ArrayList<String>tables;
     private String name;
     private String path;
+   // private Table activeTable;
 
     MyDataBase(String name)
     {
+      //  activeTable = null;
         this.name = name;
         tables = new ArrayList<>();
     }
@@ -19,28 +21,27 @@ class MyDataBase {
     {
 
         Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
-        //TableFactory.createTable(getPath(), getPath(), );
+        TableFactory.createTable(getPath(), getPath(), (String[]) Data[0], (Integer[]) Data[1], tableName);
         newTable.setTableName(tableName);
-        tables.add(newTable);
+        tables.add(tableName);
         return true;
     }
 
-    boolean removeTable(String tableName)
-    {
+    boolean removeTable(String tableName) throws SQLException {
         Table desiredTable = getTheDesiredTable(tableName);
 
         if (desiredTable == null)
             return false;
 
         else
-            tables.remove(desiredTable);
+            tables.remove(desiredTable.getTableName());
 
         return true;
 
     }
 
-    int editTable(Object[][] newContent, String tableName)
-    {
+    int editTable(Object[][] newContent, String tableName) throws SQLException {
+
         Table desiredTable = getTheDesiredTable(tableName);
 
         if (desiredTable == null)
@@ -105,13 +106,13 @@ class MyDataBase {
     String getPath() {
         return path;
     }
-    private Table getTheDesiredTable(String tableName)
-    {
-        for (Table table : tables)
+
+    private Table getTheDesiredTable(String tableName) throws SQLException {
+        for (String table : tables)
         {
-            if (table.getTableName().equals(tableName))
-            {
-                return table;
+            if (table.equals(tableName)) {
+                return TableFactory.loadTable(this.getPath() + "\\" + tableName + ".xml",
+                        this.getPath() + "\\" + tableName + ".xsd");
             }
         }
         return null;
