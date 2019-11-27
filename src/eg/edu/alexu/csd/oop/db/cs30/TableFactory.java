@@ -22,8 +22,8 @@ import java.util.Map;
 
 public class TableFactory {
 
-    public static void createTable(String tablePath,String schemaPath,String[] columnNames,Integer[] columnTypes,String tableName) throws SQLException {
-        createTableSchema(schemaPath, columnNames, columnTypes);
+    public static void createTable(String databasePath, String tableName, String[] columnNames, Integer[] columnTypes) throws SQLException {
+        createTableSchema(databasePath+"/"+tableName+".xsd", columnNames, columnTypes);
 
         // Create empty file
         try {
@@ -34,7 +34,7 @@ public class TableFactory {
             Transformer transformer = transformerFactory.newTransformer();
 
             DOMSource domSource = new DOMSource(xmlDocument);
-            StreamResult streamResult = new StreamResult(new File(tablePath));
+            StreamResult streamResult = new StreamResult(new File(databasePath+"/"+tableName+".xml"));
 
             transformer.transform(domSource, streamResult);
         }
@@ -72,11 +72,75 @@ public class TableFactory {
     }
 
     /**
+     * Create database schema
+     */
+    private static void createDatabaseSchema(String[] tableNames, String databaseSchemaPath) throws SQLException {
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document xmlDocument = documentBuilder.newDocument();
+
+            Element root = xmlDocument.createElement("schema");
+            xmlDocument.appendChild(root);
+
+            for (int i = 0, tables = tableNames.length; i < tables; i++)
+            {
+                // Create element and attributes
+                Element columnElement = xmlDocument.createElement("element");
+                columnElement.setAttribute("name", tableNames[i]);
+                root.appendChild(columnElement);
+            }
+
+            // Write to file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+            DOMSource domSource = new DOMSource(xmlDocument);
+            StreamResult streamResult = new StreamResult(new File(databaseSchemaPath));
+
+            transformer.transform(domSource, streamResult);
+        }
+        catch (Exception e) {
+            throw new SQLException();
+        }
+    }
+
+    /**
+     * Read database schema
+     */
+    public static String[] readDatabaseSchema(String schemaPath) throws SQLException {
+        File file = new File(schemaPath);
+
+        List<String> tableNames = new ArrayList<>();
+
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document xmlDocument = documentBuilder.parse(file);
+
+            // Find all elements
+            NodeList elements = xmlDocument.getElementsByTagName("element");
+            for (int i = 0; i < elements.getLength(); i++)
+            {
+                if (elements.item(i).getNodeType() == Node.ELEMENT_NODE)
+                {
+                    Element element = (Element) elements.item(i);
+                    tableNames.add(element.getAttribute("name"));
+                }
+            }
+        }
+        catch (Exception e) {
+            throw new SQLException("Error while loading schema");
+        }
+
+        return tableNames.toArray(new String[0]);
+    }
+
+    /**
      * Create table schema.
      */
     private static void createTableSchema(String schemaPath, String[] columnNames, Integer[] columnTypes) throws SQLException {
-        File file = new File(schemaPath);
-
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
