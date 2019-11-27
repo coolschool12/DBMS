@@ -337,10 +337,11 @@ public class TableFactory {
                 if (objects[i] != null) {
 
                     Element cell = doc.createElement(tableColumnNames[i]);
-                    cell.appendChild(doc.createTextNode((String) objects[i]));
+                    cell.appendChild(doc.createTextNode(objects[i].toString()));
                     row.appendChild(cell);
                 }
             }
+            rootElement.appendChild(row);
         }
     }
 
