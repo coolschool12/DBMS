@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 class MyDataBase {
     private ArrayList<String>tables;
@@ -13,9 +14,14 @@ class MyDataBase {
     MyDataBase(String name, String dataBasePath) throws SQLException {
 
         path = dataBasePath + System.getProperty("file.separator") + name;
-        this.name = name;
+
+        // Change name
+        String pattern = Pattern.quote(System.getProperty("file.separator"));
+        String[] splitName = name.split(pattern);
+        this.name = splitName[splitName.length - 1];
+
         makeDataBaseFolder(path);
-        tables = TableFactory.readDatabaseSchema(path + System.getProperty("file.separator") + name + ".xsd");
+        tables = TableFactory.readDatabaseSchema(path + System.getProperty("file.separator") + this.name + ".xsd");
     }
 
     boolean addTable(Object[][] Data, String tableName) throws SQLException
@@ -169,7 +175,7 @@ class MyDataBase {
     private void makeDataBaseFolder(String dataBasePath) throws SQLException {
         File file = new File(this.path);
 
-        if (file.mkdir())
+        if (file.mkdirs())
             TableFactory.createDatabaseSchema(new String[0], dataBasePath + System.getProperty("file.separator") + name + ".xsd");
 
     }
