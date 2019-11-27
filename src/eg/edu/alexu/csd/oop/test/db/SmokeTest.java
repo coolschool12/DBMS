@@ -86,7 +86,6 @@ public class SmokeTest {
         } catch (Throwable e){
             TestRunner.fail("Unknown Exception thrown", e);
         }
-
     }
     
     @Test

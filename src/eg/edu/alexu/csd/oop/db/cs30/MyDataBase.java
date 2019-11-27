@@ -19,8 +19,7 @@ class MyDataBase {
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] splitName = name.split(pattern);
         this.name = splitName[splitName.length - 1];
-
-        makeDataBaseFolder(path);
+        makeDataBaseFolder();
         tables = TableFactory.readDatabaseSchema(path + System.getProperty("file.separator") + this.name + ".xsd");
     }
 
@@ -172,11 +171,8 @@ class MyDataBase {
         return stringValues.toArray(new String[0]);
     }
 
-    private void makeDataBaseFolder(String dataBasePath) throws SQLException {
+    private void makeDataBaseFolder() {
         File file = new File(this.path);
-
-        if (file.mkdirs())
-            TableFactory.createDatabaseSchema(new String[0], dataBasePath + System.getProperty("file.separator") + name + ".xsd");
-
+        file.mkdirs();
     }
 }
