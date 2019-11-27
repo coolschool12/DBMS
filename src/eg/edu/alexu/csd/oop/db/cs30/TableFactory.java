@@ -124,6 +124,11 @@ public class TableFactory {
 
         ArrayList<String> tableNames = new ArrayList<>();
 
+        if (!file.exists())
+        {
+            return tableNames;
+        }
+
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();

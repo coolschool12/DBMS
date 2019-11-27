@@ -101,9 +101,6 @@ public class ExtractData {
                     throw new SQLException("Incorrect values.");
                 }
             }
-
-            // Cast column names to lowercase
-            objects[1][i] = ((String) objects[1][i]).toLowerCase();
         }
 
         objects[0] = values;
