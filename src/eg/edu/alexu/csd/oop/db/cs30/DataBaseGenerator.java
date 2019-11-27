@@ -119,7 +119,7 @@ public class DataBaseGenerator implements Database {
         }
         else if (exp.getId() == 0) {
             if (!isFound) {
-                activeDataBase = new MyDataBase(dataBaseName, pathToDatabases+"/"+dataBaseName);
+                activeDataBase = new MyDataBase(dataBaseName, pathToDatabases);
                 dataBases.add(activeDataBase);
                 return true;
             }

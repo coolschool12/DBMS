@@ -10,24 +10,19 @@ class MyDataBase {
     private ArrayList<String>tables;
     private String name;
     private String path;
-   // private Table activeTable;
 
     MyDataBase(String name, String dataBasePath) throws SQLException {
-      //  activeTable = null;
 
         path = dataBasePath + "/" + name;
-        tables = (ArrayList<String>) Arrays.asList(TableFactory.readDatabaseSchema(dataBasePath + "/" + name + ".xsd"));
         this.name = name;
-        makeDataBaseFolder();
-
+        makeDataBaseFolder(dataBasePath);
+        tables = (ArrayList<String>) Arrays.asList(TableFactory.readDatabaseSchema(dataBasePath + "/" + name + ".xsd"));
     }
 
     boolean addTable(Object[][] Data, String tableName) throws SQLException
     {
 
-        //Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
         TableFactory.createTable(getPath(),tableName , (String[]) Data[0], (Integer[]) Data[1]);
-        //newTable.setTableName(tableName);
         tables.add(tableName);
         return true;
     }
@@ -158,11 +153,11 @@ class MyDataBase {
         return stringValues.toArray(new String[0]);
     }
 
-    private void makeDataBaseFolder() throws SQLException {
+    private void makeDataBaseFolder(String dataBasePath) throws SQLException {
         File file = new File(this.path);
 
-        if (!file.mkdir())
-            throw new SQLException("Theres Another Folder with the Same Name");
+        if (file.mkdir())
+            TableFactory.createDatabaseSchema(new String[0], dataBasePath + "/" + name + ".xsd");
 
     }
 }

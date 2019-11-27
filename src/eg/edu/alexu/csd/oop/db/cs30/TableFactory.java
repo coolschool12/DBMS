@@ -86,7 +86,7 @@ public class TableFactory {
     /**
      * Create database schema
      */
-    private static void createDatabaseSchema(String[] tableNames, String databaseSchemaPath) throws SQLException {
+    public static void createDatabaseSchema(String[] tableNames, String databaseSchemaPath) throws SQLException {
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
