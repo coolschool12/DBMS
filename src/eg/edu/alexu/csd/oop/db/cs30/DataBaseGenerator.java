@@ -112,6 +112,7 @@ public class DataBaseGenerator implements Database {
             }
             else
             {
+                TableFactory.delete(activeDataBase.getPath());
                 dataBases.remove(activeDataBase);
                 activeDataBase = null;
                 return true;

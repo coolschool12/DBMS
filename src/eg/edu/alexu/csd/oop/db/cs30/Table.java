@@ -9,9 +9,11 @@ public class Table {
     private String[] columnNames;
     private ArrayList<Row> rows;
     private String tableName;
+    private Integer[] columnTypes;
     //specify column names and types
     public Table (String[] columnNames,Integer[] columnTypes) throws SQLException {
         rows=new ArrayList<Row>();
+        this.columnTypes = columnTypes;
         this.columnNames=columnNames;
         for(int i=0;i<columnNames.length;i++){
             map.put(columnNames[i],columnTypes[i]);
@@ -22,6 +24,10 @@ public class Table {
     }
     public HashMap<String,Integer> getMap(){
         return map;
+    }
+
+    public Integer[] getColumnTypes() {
+        return columnTypes;
     }
 
     public String getTableName() {

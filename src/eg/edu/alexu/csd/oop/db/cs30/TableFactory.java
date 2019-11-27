@@ -58,7 +58,9 @@ public class TableFactory {
             saveCellstoXml(table, doc);
 
             // send all the stuff to the transformer so it can transform the doc object to the file with that path
-            writeToFile(tablePath, doc);
+            writeToFile(tablePath  + "\\" + table.getTableName() + ".xml", doc);
+
+            createTableSchema(tablePath  + "\\" + table.getTableName() + ".xsd",  table.getColumnNames(), table.getColumnTypes());
 
         } catch (ParserConfigurationException | TransformerException e) {
 
@@ -215,7 +217,7 @@ public class TableFactory {
                 values.add(tag.getTextContent());
             }
             Object[][] result=parser(coulmnNames,values,table.getMap());
-            table.insertRow(  (String[]) result[0] ,  result[1]  );
+            table.insertRow((String[]) result[0] ,  result[1]);
         }
         return table;
     }

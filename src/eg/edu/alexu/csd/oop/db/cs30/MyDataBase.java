@@ -3,7 +3,6 @@ package eg.edu.alexu.csd.oop.db.cs30;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 class MyDataBase {
@@ -21,9 +20,10 @@ class MyDataBase {
 
     boolean addTable(Object[][] Data, String tableName) throws SQLException
     {
-
+        Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
         TableFactory.createTable(getPath(),tableName , (String[]) Data[0], (Integer[]) Data[1]);
         tables.add(tableName);
+        TableFactory.saveTable(this.getPath(), newTable);
         return true;
     }
 
@@ -37,10 +37,9 @@ class MyDataBase {
             boolean deleteTable = TableFactory.delete(this.getPath() + "/" + desiredTable.getTableName() + ".xml");
             boolean deleteScheme = TableFactory.delete(this.getPath() + "/" + desiredTable.getTableName() + ".xsd");
             tables.remove(desiredTable.getTableName());
+            TableFactory.createDatabaseSchema(tables.toArray(new String[0]), path + "/" + name + ".xsd");
             return deleteTable && deleteScheme;
         }
-
-
     }
 
     int editTable(Object[][] newContent, String tableName) throws SQLException {
@@ -53,30 +52,36 @@ class MyDataBase {
         {
             Object[] values = newContent[0];
             String[] columnNames = (String[]) newContent[1];
-            return desiredTable.insertRow(columnNames, values);
+            int x =  desiredTable.insertRow(columnNames, values);
+            TableFactory.saveTable(this.getPath(), desiredTable);
+            return x;
         }
     }
 
     Object[][] select(HashMap<String, Object> properties) throws SQLException {
 
         Table selectedTable = dealWithTheHash(properties);
+        Object[][] cells;
 
         if (properties.get("starflag").equals(1)) {
             if (properties.containsKey("operator"))
-                return selectedTable.select((String) properties.get("condColumns"), ((String) properties.get("operator")).charAt(0), properties.get("condValue"));
+                cells = selectedTable.select((String) properties.get("condColumns"), ((String) properties.get("operator")).charAt(0), properties.get("condValue"));
+
 
             else
-                return selectedTable.select();
+                cells = selectedTable.select();
         }
         else {
             String[] columnNames = toStringArray(getColumnsStuff(properties, "selectedColumn"));
 
             if (properties.containsKey("operator"))
-                return  selectedTable.select(columnNames,(String) properties.get("condColumns"),((String) properties.get("operator")).charAt(0), properties.get("condValue"));
+                cells =  selectedTable.select(columnNames,(String) properties.get("condColumns"),((String) properties.get("operator")).charAt(0), properties.get("condValue"));
 
             else
-                return selectedTable.select(columnNames);
+                cells = selectedTable.select(columnNames);
         }
+        TableFactory.saveTable(this.getPath(), selectedTable);
+        return cells;
 
     }
 
@@ -84,7 +89,10 @@ class MyDataBase {
 
         Table selectedTable = dealWithTheHash(properties);
 
-       return selectedTable.delete((String) properties.get("condColumns"),((String) properties.get("operator")).charAt(0), properties.get("condValue"));
+       int x = selectedTable.delete((String) properties.get("condColumns"),((String) properties.get("operator")).charAt(0), properties.get("condValue"));
+       TableFactory.saveTable(this.getPath(), selectedTable);
+
+       return x;
     }
 
 
@@ -94,12 +102,17 @@ class MyDataBase {
 
         String[] columnNames = toStringArray(getColumnsStuff(properties, "selectedColumn"));
         Object[] columnValues = getColumnsStuff(properties, "setValue");
+        int x;
 
         if (properties.containsKey("operator"))
-            return selectedTable.update(columnNames, columnValues,(String) properties.get("condColumns"),((String) properties.get("operator")).charAt(0), properties.get("condValue"));
+            x = selectedTable.update(columnNames, columnValues,(String) properties.get("condColumns"),((String) properties.get("operator")).charAt(0), properties.get("condValue"));
 
         else
-            return selectedTable.update(columnNames, columnValues);
+            x = selectedTable.update(columnNames, columnValues);
+
+        TableFactory.saveTable(this.getPath(), selectedTable);
+        return x;
+
     }
 
     String getName() {
