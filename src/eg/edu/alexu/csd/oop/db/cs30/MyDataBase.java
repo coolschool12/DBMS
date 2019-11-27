@@ -14,13 +14,15 @@ class MyDataBase {
     MyDataBase(String name, String dataBasePath) throws SQLException {
 
         path = dataBasePath + System.getProperty("file.separator") + name;
+        this.name = name;
 
         // Change name
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] splitName = name.split(pattern);
-        this.name = splitName[splitName.length - 1];
+        name = splitName[splitName.length - 1];
+
         makeDataBaseFolder();
-        tables = TableFactory.readDatabaseSchema(path + System.getProperty("file.separator") + this.name + ".xsd");
+        tables = TableFactory.readDatabaseSchema(path + System.getProperty("file.separator") + name + ".xsd");
     }
 
     boolean addTable(Object[][] Data, String tableName) throws SQLException
