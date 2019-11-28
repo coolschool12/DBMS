@@ -1,5 +1,7 @@
 package eg.edu.alexu.csd.oop.db.cs30.queries;
 
+import java.sql.SQLException;
+
 /**
  * Builds a query object
  */
@@ -7,7 +9,7 @@ public class QueryBuilder {
     /**
      * @return a query object based on a string
      */
-    public static Query buildQuery(String query) {
+    public static Query buildQuery(String query) throws SQLException {
         String[] splitQuery = ExtractData.removeEmptyStrings(query.split(" "));
 
         // Check statement type
@@ -25,7 +27,7 @@ public class QueryBuilder {
             }
             else
             {
-                return null;
+                throw new SQLException("Invalid query.");
             }
         }
         else if (splitQuery[0].equalsIgnoreCase("drop"))
@@ -42,7 +44,7 @@ public class QueryBuilder {
             }
             else
             {
-                return null;
+                throw new SQLException("Invalid query.");
             }
         }
         else if (splitQuery[0].equalsIgnoreCase("insert"))
@@ -63,7 +65,7 @@ public class QueryBuilder {
         }
         else
         {
-            return null;
+            throw new SQLException("Invalid query.");
         }
     }
 }

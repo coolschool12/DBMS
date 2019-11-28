@@ -1,5 +1,8 @@
 package eg.edu.alexu.csd.oop.db.cs30.queries;
 
+import eg.edu.alexu.csd.oop.db.Database;
+
+import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 /**
@@ -16,5 +19,11 @@ public class Delete implements Query {
     @Override
     public int getId() {
         return 5;
+    }
+
+    @Override
+    public void execute(Database database, String query) throws SQLException {
+        int numberOfRows = database.executeUpdateQuery(query);
+        System.out.println(numberOfRows + " rows were changed.");
     }
 }

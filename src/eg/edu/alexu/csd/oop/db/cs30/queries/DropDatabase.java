@@ -1,5 +1,8 @@
 package eg.edu.alexu.csd.oop.db.cs30.queries;
 
+import eg.edu.alexu.csd.oop.db.Database;
+
+import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 /**
@@ -15,5 +18,17 @@ public class DropDatabase implements Query {
     @Override
     public int getId() {
         return 2;
+    }
+
+    @Override
+    public void execute(Database database, String query) throws SQLException {
+        if(database.executeStructureQuery(query))
+        {
+            System.out.println("Database was dropped successfully.");
+        }
+        else
+        {
+            System.out.println("Error while dropping database.");
+        }
     }
 }
