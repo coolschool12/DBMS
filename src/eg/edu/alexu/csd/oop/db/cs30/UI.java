@@ -34,7 +34,7 @@ public class UI {
                 query.execute(database, queryString.toLowerCase());
             }
             catch (Exception e) {
-                System.out.println("Error: incorrect SQL query.");
+                System.out.println(e.getMessage());
             }
         }
     }
