@@ -13,6 +13,16 @@ public class ExtractData {
      * Column 0: names of columns.
      * Column 1: contains 0 for string, 1 for an int.
      */
+    private static ExtractData extractData = null;
+    private ExtractData(){}
+
+    public static ExtractData makeInstance()
+    {
+        if (extractData == null)
+            extractData = new ExtractData();
+
+        return extractData;
+    }
     public Object[][] getContentsOfTableQuery(String query) {
         query = query.toLowerCase();
 

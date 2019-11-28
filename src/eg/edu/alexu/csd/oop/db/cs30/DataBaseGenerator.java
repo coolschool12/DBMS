@@ -15,11 +15,19 @@ public class DataBaseGenerator implements Database {
     private MyDataBase activeDataBase;
     private ExtractData extractData;
     private String pathToDatabases = "databases" + System.getProperty("file.separator") + ((int)(Math.random() * 100));
-
-    DataBaseGenerator()
+    private static Database database = null;
+    private DataBaseGenerator()
     {
-        extractData = new ExtractData();
+        extractData = ExtractData.makeInstance();
         dataBases = new ArrayList<>();
+    }
+
+    public static Database makeInstance()
+    {
+        if (database == null)
+            database = new DataBaseGenerator();
+
+        return database;
     }
 
     @Override

@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class UI {
     public static void main(String[] args) {
-        Database database = new DataBaseGenerator();
+        Database database = DataBaseGenerator.makeInstance();
 
         // Take user input
         String queryString = "";
