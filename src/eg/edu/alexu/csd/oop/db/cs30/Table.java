@@ -66,11 +66,11 @@ public class Table {
         return SelectFromRows(columnNames,selectedRows);
     }
     // select all columns and some of table's rows (rows selection depend on the condition)
-    public Object[][] select(String condition) throws RuntimeException{
+    public Object[][] select(String condition) throws RuntimeException, SQLException {
         return select(this.columnNames,condition);
     }
     // select some of table's columns and some of table's rows (rows selection depend on the condition)
-    public Object[][] select(String[] columnNames,String condition) throws RuntimeException{
+    public Object[][] select(String[] columnNames,String condition) throws RuntimeException, SQLException {
 
         ArrayList<Integer> selectedRows=new ArrayList<Integer>();
         for(int i=0;i<rows.size();i++){
@@ -89,7 +89,7 @@ public class Table {
         return result;
     }
     // Delete some of table's rows (rows selection depend on the condition)
-    public int delete(String condition) throws RuntimeException{
+    public int delete(String condition) throws RuntimeException, SQLException {
         int counter=0;
         int i=0;
         while (i<rows.size()){
@@ -109,7 +109,7 @@ public class Table {
         return size;
     }
     // update some of columns(columnNames) with certain (values) for some rows (rows selection depend on the condition)
-    public int update(String[] columnNames,Object[] values,String condition) throws RuntimeException{
+    public int update(String[] columnNames,Object[] values,String condition) throws RuntimeException, SQLException {
         this.checkColumns(columnNames);
         this.checkTypes(columnNames,values);
         int counter=0;
