@@ -114,9 +114,7 @@ public class ExtractData {
      * @return
      */
     public Map<String , Object> SelectedProperties(String s) {
-        //s = s.replaceAll("'","");
         s = s.toLowerCase();
-        String condValue;
         Map <String , Object> table = new HashMap<>();
 
         table.put("starflag" , 0);
@@ -124,15 +122,10 @@ public class ExtractData {
         if(s.toLowerCase().contains("*") && s.toLowerCase().contains("where")){
             table.put("starflag" , 1);
             String[] splitQuery = s.split("(FROM|from)\\s+|\\s*(WHERE|where)\\s+|\\s*(=|<|>)\\s*");
-            if(s.toLowerCase().contains("=")) table.put("operator" , "=");
-            else if(s.toLowerCase().contains(">")) table.put("operator" , ">");
-            else if(s.toLowerCase().contains("<")) table.put("operator" , "<");
 
             table.put("tableName" , splitQuery[1]);
-            table.put("condColumns" , splitQuery[2]);
-            if (splitQuery[3].contains("'")){ table.put("condValue",splitQuery[3].replaceAll("'","")); }
-            else { if(splitQuery[3].matches("\\d+")) table.put("condValue",Integer.parseInt(splitQuery[3]));
-            else return null; }
+            splitQuery = s.split("\\s*(WHERE|where)\\s+");
+            table.put("operator" , splitQuery[1]);
 
         }
         else if(s.toLowerCase().contains("*")){
@@ -140,23 +133,16 @@ public class ExtractData {
             String[] splitQuery = s.split("(from|FROM)\\s*");
             table.put("tableName" , splitQuery[1]);
         }else if(s.toLowerCase().contains("where")){
-            String[] splitQuery = s.split("\\s*select\\s*|\\s*,\\s*|\\s*from\\s*|\\s*where\\s*|\\s*(=|<|>)\\s*");
+            String[] splitQuery = s.split("\\s*select\\s*|\\s*,\\s*|\\s*from\\s*|\\s*where\\s*");
 
             int i;
-            for( i=1;i<=splitQuery.length-4;i++){
+            for( i=1;i<=splitQuery.length-3;i++){
                 table.put("selectedColumn"+ i,splitQuery[i]);
             }
-            table.put("sizeOfSelectedColoumns",splitQuery.length-4);
-
-            if(s.toLowerCase().contains("=")) table.put("operator" , "=");
-            else if(s.toLowerCase().contains(">")) table.put("operator" , ">");
-            else if(s.toLowerCase().contains("<")) table.put("operator" , "<");
-
-            table.put("tableName" , splitQuery[splitQuery.length-3]);
-            table.put("condColumns" , splitQuery[splitQuery.length-2]);
-            if (splitQuery[splitQuery.length-1].contains("'")){ table.put("condValue",splitQuery[splitQuery.length-1].replaceAll("'","")); }
-            else { if(splitQuery[splitQuery.length-1].matches("\\d+")) table.put("condValue",Integer.parseInt(splitQuery[splitQuery.length-1]));
-            else return null; }
+            table.put("sizeOfSelectedColoumns",splitQuery.length-3);
+            table.put("tableName" , splitQuery[splitQuery.length-2]);
+            splitQuery = s.split("\\s*(WHERE|where)\\s+");
+            table.put("operator" , splitQuery[1]);
         }
         else{
             String[] splitQuery = s.split("[\\s,]+");
@@ -172,23 +158,18 @@ public class ExtractData {
     }
 
     public Map<String , Object> DeleteProperties(String s){
-        //s = s.replaceAll("'","");
 
         s = s.toLowerCase();
         Map <String , Object> table = new HashMap<>();
         if(s.toLowerCase().contains("where")){
             Pattern pattern = Pattern.compile("(FROM|from)\\s*|\\s*(WHERE|where)\\s*|\\s*(=|<|>)\\s*", Pattern.CASE_INSENSITIVE);
             String[] splitQuery = pattern.split(s);
-            if(s.toLowerCase().contains("=")) table.put("operator" , "=");
-            else if(s.toLowerCase().contains(">")) table.put("operator" , ">");
-            else if(s.toLowerCase().contains("<")) table.put("operator" , "<");
+
 
             table.put("tableName" , splitQuery[1]);
-            table.put("condColumns" , splitQuery[2]);
-            if (splitQuery[3].contains("'")){ table.put("condValue",splitQuery[3].replaceAll("'","")); }
-            else { if(splitQuery[3].matches("\\d+")) table.put("condValue",Integer.parseInt(splitQuery[3]));
-            else return null; }
 
+            splitQuery = s.split("\\s*(WHERE|where)\\s+");
+            table.put("operator" , splitQuery[1]);
 
         }else {
             String[] splitQuery = s.split("\\s+");
@@ -200,17 +181,12 @@ public class ExtractData {
     public Map<String , Object> UpadteProperties(String s){
         s = s.toLowerCase();
         Map <String , Object> table = new HashMap<>();
-
         if(s.toLowerCase().contains("where")){
-            String[] splitQuery = s.split("(UPDATE|update)\\s*|\\s*(SET|set)\\s+|\\s*(WHERE|where)\\s+|\\s*(=|<|>)\\s*|\\s*,\\s*");
-
-
-            if(s.toLowerCase().contains(">")) table.put("operator" , ">");
-            else if(s.toLowerCase().contains("<")) table.put("operator" , "<");
-            else if(s.toLowerCase().contains("=")) table.put("operator" , "=");
+            String[] splited  = s.split("\\s*(WHERE|where)\\s+");
+            String[] splitQuery = splited[0].split("(UPDATE|update)\\s*|\\s*(SET|set)\\s+|\\s*(=|<|>)\\s*|\\s*,\\s*");
 
             int m =1;
-            for(int j=0;j<(splitQuery.length-4);){
+            for(int j=0;j<(splitQuery.length-2);){
                 table.put("selectedColumn"+ m,splitQuery[j+2].replaceAll("'",""));
                 if (splitQuery[j+3].contains("'")){ table.put("setValue"+ m++,splitQuery[j+3].replaceAll("'","")); }
                 else { if(splitQuery[j+3].matches("\\d+")) table.put("setValue"+ m++,Integer.parseInt(splitQuery[j+3]));
@@ -220,13 +196,8 @@ public class ExtractData {
 
             table.put("sizeOfSelectedColoumns" ,m-1);
             table.put("tableName" , splitQuery[1]);
-            table.put("condColumns" , splitQuery[splitQuery.length-2]);
-
-            if (splitQuery[splitQuery.length-1].contains("'")){ table.put("condValue",splitQuery[splitQuery.length-1].replaceAll("'","")); }
-            else { if(splitQuery[splitQuery.length-1].matches("\\d+")) table.put("condValue",Integer.parseInt(splitQuery[splitQuery.length-1]));
-            else return null; }
-
-
+            splitQuery = s.split("\\s*(WHERE|where)\\s+");
+            table.put("operator" , splitQuery[1]);
         }else {
             String[] splitQuery = s.split("(UPDATE|update)\\s*|\\s*=\\s*|\\s*(SET|set)\\s+|\\s*,\\s*");
             int m =1;
