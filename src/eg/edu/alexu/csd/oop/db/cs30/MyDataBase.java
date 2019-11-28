@@ -82,7 +82,7 @@ class MyDataBase {
 
         if (properties.get("starflag").equals(1)) {
             if (properties.containsKey("operator"))
-                cells = selectedTable.select((String) properties.get("condColumns"), ((String) properties.get("operator")).charAt(0), properties.get("condValue"));
+                cells = selectedTable.select((String) properties.get("operator"));
 
 
             else
@@ -92,7 +92,7 @@ class MyDataBase {
             String[] columnNames = toStringArray(getColumnsStuff(properties, "selectedColumn"));
 
             if (properties.containsKey("operator"))
-                cells =  selectedTable.select(columnNames,(String) properties.get("condColumns"),((String) properties.get("operator")).charAt(0), properties.get("condValue"));
+                cells =  selectedTable.select(columnNames, (String) properties.get("operator"));
 
             else
                 cells = selectedTable.select(columnNames);
@@ -107,7 +107,7 @@ class MyDataBase {
         Table selectedTable = dealWithTheHash(properties);
         int x;
         if (properties.containsKey("operator"))
-            x = selectedTable.delete((String) properties.get("condColumns"),((String) properties.get("operator")).charAt(0), properties.get("condValue"));
+            x = selectedTable.delete((String) properties.get("operator"));
 
         else
             x = selectedTable.delete();
@@ -126,7 +126,7 @@ class MyDataBase {
         int x;
 
         if (properties.containsKey("operator"))
-            x = selectedTable.update(columnNames, columnValues,(String) properties.get("condColumns"),((String) properties.get("operator")).charAt(0), properties.get("condValue"));
+            x = selectedTable.update(columnNames, columnValues, (String) properties.get("operator"));
 
         else
             x = selectedTable.update(columnNames, columnValues);
