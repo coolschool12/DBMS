@@ -207,6 +207,6 @@ public class Row {
                 throw new SQLException("double Quote missing");
         }
 
-        return Condition((String) map.get("condColumn"),(char)map.get("operator"),map.get("condValue"));
+        return Condition((String) table.get("condColumn"),((String)table.get("operator")).charAt(0), table.get("condValue"));
     }
 }
