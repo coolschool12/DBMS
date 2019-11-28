@@ -36,7 +36,7 @@ public class Row {
             map.put(columnNames[i],values[i]);
         }
     }
-    public Boolean Condition(String ColumnName,char Operator,Object value) throws RuntimeException{
+    public Boolean Condition(String ColumnName,char Operator,Object value) throws SQLException{
         checkCondition(ColumnName,value);
         Object val=map.get(ColumnName);
         Integer type=myTable.getMap().get(ColumnName);
@@ -75,11 +75,11 @@ public class Row {
             return false;
         }
     }
-    private void checkCondition(String ColumnName,Object value) throws RuntimeException{
+    private void checkCondition(String ColumnName,Object value) throws SQLException{
         myTable.checkColumns(new String[]{ColumnName});
         myTable.checkTypes(new String[]{ColumnName}, new Object[]{value} );
     }
-    public boolean multiCondtion(String condtion) throws SQLException {
+    public Boolean multiCondtion(String condtion) throws SQLException {
         String[] array=split(condtion);
         Stack<Object> stack=new Stack<>();
         Integer start=0;
@@ -92,43 +92,43 @@ public class Row {
                 if( !(prevId==5 || prevId==2) ){
                     stack.push("(");
                 }else
-                    throw new RuntimeException("can't have open bracket after condtion");
+                    throw new SQLException("can't have open bracket after condtion");
 
             }else if(id==2){
 
                 try {
                     String poped= (String) stack.pop();
                     if(!poped.equals("("))
-                        throw new RuntimeException("close bracket don't match open bracket");
+                        throw new SQLException("close bracket don't match open bracket");
                 }catch (ClassCastException e){
-                    throw new RuntimeException("close bracket don't match open bracket");
+                    throw new SQLException("close bracket don't match open bracket");
                 }
 
             }else if(id==3){
                 if(prevId==5){
                     stack.push(array[i]);
                 }else
-                    throw new RuntimeException(array[i]+ " must have condion before it");
+                    throw new SQLException(array[i]+ " must have condion before it");
             }else if(id == 4){
                 if(!(prevId==5 || prevId==2)){
                     stack.push(array[i]);
                 }else
-                    throw new RuntimeException("can't have not after condtion");
+                    throw new SQLException("can't have not after condtion");
             }else if(id==5){
                 Boolean result=oneCondition(array[i]);
                 if( !(prevId==5 || prevId==2) ){
                     stack.push(result);
                     evaluate(stack);
                 }else
-                    throw new RuntimeException("can't have two or more conditions in row");
+                    throw new SQLException("can't have two or more conditions in row");
             }
         }
         if(stack.size()!=2 || !(stack.peek() instanceof Boolean)){
-            throw new RuntimeException("brackets don't matching");
+            throw new SQLException("brackets don't matching");
         }
         return (Boolean) stack.peek();
     }
-    private void evaluate(Stack<Object> stack){
+    private void evaluate(Stack<Object> stack) throws SQLException {
         Boolean top= (Boolean) stack.pop();
         int prevId=getId(stack.peek());
         while (prevId==3 || prevId==4){
@@ -143,13 +143,13 @@ public class Row {
                 }else if(operator.equalsIgnoreCase("or")){
                     top=top || otherCondition;
                 }else
-                    throw new RuntimeException("not and or OR !!!");
+                    throw new SQLException("not and or OR !!!");
             }
             prevId=getId(stack.peek());
         }
         stack.push(top);
     }
-    private int getId(Object element){
+    private int getId(Object element) throws SQLException {
         if(element instanceof Integer)
             return 0;
         else if(element instanceof String){
@@ -166,7 +166,7 @@ public class Row {
                 return 5;
         }else if(element instanceof Boolean)
             return 5;
-        throw new RuntimeException("not String or Boolean");
+        throw new SQLException("not String or Boolean");
     }
 
     private String[] split(String condition){
@@ -204,7 +204,7 @@ public class Row {
             if(splitQuery[1].matches("\\d+"))
                 table.put("condValue",Integer.parseInt(splitQuery[1]));
             else
-                throw new RuntimeException("double Quote missing");
+                throw new SQLException("double Quote missing");
         }
 
         return Condition((String) map.get("condColumn"),(char)map.get("operator"),map.get("condValue"));
