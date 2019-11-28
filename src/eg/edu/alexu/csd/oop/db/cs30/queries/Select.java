@@ -17,7 +17,7 @@ public class Select implements Query {
 
     @Override
     public boolean isCorrect(String query) {
-        Pattern pattern = Pattern.compile("(^\\s*SELECT\\s+(([^\\s]+\\s*,\\s*)*\\s*([^\\s]+)|\\*)\\s+FROM\\s+[^\\s]+((\\s+WHERE\\s+[^\\s]+)|\\s*)(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(^\\s*SELECT\\s+(([^\\s]+\\s*,\\s*)*\\s*([^\\s]+)|\\*)\\s+FROM\\s+[^\\s]+((\\s+WHERE\\s+.+)|\\s*)(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
         return pattern.matcher(query).matches();
     }
 
@@ -37,8 +37,8 @@ public class Select implements Query {
     }
 
     private String checkOrderBy(String query) throws SQLException {
-        Pattern pattern = Pattern.compile("(^\\s*SELECT\\s+(([^\\s]+\\s*,\\s*)*\\s*([^\\s]+)|\\*)\\s+FROM\\s+[^\\s]+((\\s+WHERE\\s+[^\\s]+)|\\s*)(\\s+ORDER\\s+BY\\s+(\\s*[^\\s]+\\s*(ASC|DESC)\\s*,)*\\s*(\\s*[^\\s]+\\s*(ASC|DESC)\\s*))(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
-        Pattern splitPattern = Pattern.compile("(^\\s*SELECT\\s+(([^\\s]+\\s*,\\s*)*\\s*([^\\s]+)|\\*)\\s+FROM\\s+[^\\s]+((\\s+WHERE\\s+[^\\s]+)|\\s*)((\\s+ORDER\\s+BY\\s+)|\\s*)|(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(^\\s*SELECT\\s+(([^\\s]+\\s*,\\s*)*\\s*([^\\s]+)|\\*)\\s+FROM\\s+[^\\s]+((\\s+WHERE\\s+.+)|\\s*)(\\s+ORDER\\s+BY\\s+(\\s*[^\\s]+\\s*(ASC|DESC)\\s*,)*\\s*(\\s*[^\\s]+\\s*(ASC|DESC)\\s*))(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
+        Pattern splitPattern = Pattern.compile("(^\\s*SELECT\\s+(([^\\s]+\\s*,\\s*)*\\s*([^\\s]+)|\\*)\\s+FROM\\s+[^\\s]+((\\s+WHERE\\s+.+)|\\s*)((\\s+ORDER\\s+BY\\s+)|\\s*)|(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
 
         if (pattern.matcher(query).matches())
         {
@@ -64,7 +64,8 @@ public class Select implements Query {
                     }
                     else
                     {
-                        throw new SQLException();
+                        whichOrder.add(0);
+                        i--;
                     }
                 }
             }
