@@ -238,7 +238,7 @@ public class ExtractData {
     /**
      * Remove empty strings from an array
      */
-    static String[] removeEmptyStrings(String[] stringsArray) {
+    public static String[] removeEmptyStrings(String[] stringsArray) {
         List<String> removeEmptyElements = new ArrayList<>(Arrays.asList(stringsArray));
         removeEmptyElements.removeAll(Collections.singleton(""));
 

@@ -1,10 +1,12 @@
 package eg.edu.alexu.csd.oop.db.cs30;
 
-import javafx.stage.Stage;
+import eg.edu.alexu.csd.oop.db.cs30.queries.ExtractData;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 public class Row {
     private HashMap<String,Object> map = new HashMap<>();
@@ -77,7 +79,7 @@ public class Row {
         myTable.checkColumns(new String[]{ColumnName});
         myTable.checkTypes(new String[]{ColumnName}, new Object[]{value} );
     }
-    public boolean multiCondtion(String condtion){
+    public boolean multiCondtion(String condtion) throws SQLException {
         String[] array=split(condtion);
         Stack<Object> stack=new Stack<>();
         Integer start=0;
@@ -166,11 +168,29 @@ public class Row {
             return 5;
         throw new RuntimeException("not String or Boolean");
     }
+
     private String[] split(String condition){
-        return null;
+        condition = condition.replaceAll("(\\s*<\\s*)", "<");
+        condition = condition.replaceAll("(\\s*>\\s*)", ">");
+        condition = condition.replaceAll("(\\s*=\\s*)", "=");
+        condition = condition.replaceAll("(\\s*<=\\s*)", "<=");
+        condition = condition.replaceAll("(\\s*>=\\s*)", ">=");
+
+        condition = condition.replaceAll("(\\s*\\(\\s*)", " ( ");
+        condition = condition.replaceAll("(\\s*\\)\\s*)", " ) ");
+
+        return ExtractData.removeEmptyStrings(condition.split(" "));
     }
-    private Boolean oneCondition(String condition){
+
+    private Boolean oneCondition(String condition) throws SQLException {
         String s=condition;
+
+        Pattern pattern = Pattern.compile("(\\s*[^\\s]+\\s*[<>=]\\s*[^\\s]+\\s*)", Pattern.CASE_INSENSITIVE);
+        if (!pattern.matcher(condition).matches())
+        {
+            throw new SQLException("Condition doesn't match");
+        }
+
         Map<String , Object> table = new HashMap<>();
         String[] splitQuery = condition.split("\\s*(=|<|>)\\s*");
 
