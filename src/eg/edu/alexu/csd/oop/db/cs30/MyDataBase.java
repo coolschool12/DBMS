@@ -29,10 +29,10 @@ class MyDataBase {
     {
         if (checkTable(tableName)) return false;
 
-        Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
+        //Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
         TableFactory.createTable(getPath(),tableName , (String[]) Data[0], (Integer[]) Data[1]);
         tables.add(tableName);
-        TableFactory.saveTable(this.getPath(), newTable);
+        //TableFactory.saveTable(this.getPath(), newTable);
 
         return true;
     }

@@ -63,7 +63,7 @@ public class TableFactory {
             // send all the stuff to the transformer so it can transform the doc object to the file with that path
             writeToFile(tablePath  + System.getProperty("file.separator") + table.getTableName() + ".xml", doc);
 
-            createTableSchema(tablePath  + System.getProperty("file.separator") + table.getTableName() + ".xsd",  table.getColumnNames(), table.getColumnTypes());
+           // createTableSchema(tablePath  + System.getProperty("file.separator") + table.getTableName() + ".xsd",  table.getColumnNames(), table.getColumnTypes());
 
         } catch (ParserConfigurationException | TransformerException e) {
 
