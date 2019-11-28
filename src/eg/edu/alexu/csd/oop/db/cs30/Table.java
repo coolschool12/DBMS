@@ -3,6 +3,7 @@ package eg.edu.alexu.csd.oop.db.cs30;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Condition;
 
 public class Table {
     private HashMap<String,Integer> map=new HashMap<>();
@@ -49,7 +50,7 @@ public class Table {
     public int insertRow(String[] columnNames, Object[] values) throws RuntimeException{
         this.checkColumns(columnNames);
         this.checkTypes(columnNames,values);
-        Row neo=new Row(columnNames,values);
+        Row neo=new Row(columnNames,values,this);
         rows.add(neo);
         return 1;
     }
@@ -65,16 +66,15 @@ public class Table {
         return SelectFromRows(columnNames,selectedRows);
     }
     // select all columns and some of table's rows (rows selection depend on the condition)
-    public Object[][] select(String ColumnName,char Operator,Object value) throws RuntimeException{
-        return select(this.columnNames,ColumnName,Operator,value);
+    public Object[][] select(String condition) throws RuntimeException{
+        return select(this.columnNames,condition);
     }
     // select some of table's columns and some of table's rows (rows selection depend on the condition)
-    public Object[][] select(String[] columnNames,String ColumnName,char Operator,Object value) throws RuntimeException{
-        this.checkCondition(ColumnName,value);
-        Integer typeOfColumn=map.get(ColumnName);
+    public Object[][] select(String[] columnNames,String condition) throws RuntimeException{
+
         ArrayList<Integer> selectedRows=new ArrayList<Integer>();
         for(int i=0;i<rows.size();i++){
-            if(rows.get(i).Condition(ColumnName,Operator,value,typeOfColumn))
+            if(rows.get(i).multiCondtion(condition))
                 selectedRows.add(i);
         }
         return SelectFromRows(columnNames,selectedRows);
@@ -89,13 +89,11 @@ public class Table {
         return result;
     }
     // Delete some of table's rows (rows selection depend on the condition)
-    public int delete(String ColumnName,char Operator,Object value) throws RuntimeException{
-        this.checkCondition(ColumnName,value);
-        Integer typeOfColumn=map.get(ColumnName);
+    public int delete(String condition) throws RuntimeException{
         int counter=0;
         int i=0;
         while (i<rows.size()){
-            if(rows.get(i).Condition(ColumnName,Operator,value,typeOfColumn)){
+            if(rows.get(i).multiCondtion(condition)){
                 counter++;
                 rows.remove(i);
             }else{
@@ -111,15 +109,13 @@ public class Table {
         return size;
     }
     // update some of columns(columnNames) with certain (values) for some rows (rows selection depend on the condition)
-    public int update(String[] columnNames,Object[] values,String ColumnName,char Operator,Object value) throws RuntimeException{
-        this.checkCondition(ColumnName,value);
+    public int update(String[] columnNames,Object[] values,String condition) throws RuntimeException{
         this.checkColumns(columnNames);
         this.checkTypes(columnNames,values);
-        Integer typeOfColumn=map.get(ColumnName);
         int counter=0;
         for(int i=0;i<rows.size();i++){
             Row nowRow=rows.get(i);
-            if(nowRow.Condition(ColumnName,Operator,value,typeOfColumn)){
+            if(nowRow.multiCondtion(condition)){
                 counter++;
                 nowRow.updateRow(columnNames,values);
             }
@@ -134,7 +130,7 @@ public class Table {
             rows.get(i).updateRow(columnNames,values);
         return rows.size();
     }
-    private void checkTypes(String[] columnNames,Object[] values) throws RuntimeException{
+    public void checkTypes(String[] columnNames,Object[] values) throws RuntimeException{
         //check same size
         if(columnNames.length!=values.length) {
             throw new RuntimeException("diffrenet array lengthes "+columnNames.length +" " +values.length);
@@ -152,7 +148,7 @@ public class Table {
             }
         }
     }
-    private void checkColumns(String[] columnNames) throws RuntimeException{
+    public void checkColumns(String[] columnNames) throws RuntimeException{
         //check duplication in columnNames
         Set<String> hash_Set = new HashSet<String>(Arrays.asList(columnNames));
         if(hash_Set.size()!=columnNames.length)
@@ -162,9 +158,5 @@ public class Table {
             if (map.get(columnNames[i]) == null)
                 throw new RuntimeException("No Column with such name ( " +columnNames[i]+" )");
         }
-    }
-    private void checkCondition(String ColumnName,Object value) throws RuntimeException{
-        this.checkColumns(new String[]{ColumnName});
-        this.checkTypes(new String[]{ColumnName}, new Object[]{value} );
     }
 }
