@@ -97,7 +97,7 @@ class MyDataBase {
             else
                 cells = selectedTable.select(columnNames);
         }
-        TableFactory.saveTable(this.getPath(), selectedTable);
+        //TableFactory.saveTable(this.getPath(), selectedTable);
         return cells;
 
     }
