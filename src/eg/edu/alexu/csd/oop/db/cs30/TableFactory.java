@@ -100,11 +100,10 @@ public class TableFactory {
             Element root = xmlDocument.createElement("schema");
             xmlDocument.appendChild(root);
 
-            for (int i = 0, tables = tableNames.length; i < tables; i++)
-            {
+            for (String tableName : tableNames) {
                 // Create element and attributes
                 Element columnElement = xmlDocument.createElement("element");
-                columnElement.setAttribute("name", tableNames[i]);
+                columnElement.setAttribute("name", tableName);
                 root.appendChild(columnElement);
             }
 

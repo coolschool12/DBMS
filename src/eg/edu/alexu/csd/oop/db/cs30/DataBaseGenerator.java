@@ -58,7 +58,7 @@ public class DataBaseGenerator implements Database {
     public boolean executeStructureQuery(String query) throws SQLException {
 
         Query exp = QueryBuilder.buildQuery(query);
-        if (exp == null || !exp.isCorrect(query)) throw new SQLException("OPS!!");
+        if (!exp.isCorrect(query)) throw new SQLException("OPS!!");
 
         if (exp.getId() == 0 || exp.getId() == 2)
             return dealWithDatabase(query, exp);
@@ -76,7 +76,7 @@ public class DataBaseGenerator implements Database {
 
         Query exp = QueryBuilder.buildQuery(query);
 
-        if (exp == null || activeDataBase == null)
+        if (activeDataBase == null)
             throw new SQLException("THERE IS NO AN ACTIVE DATABASE!!!");
 
         if (exp.isCorrect(query) && exp.getId() == 7)
@@ -91,7 +91,7 @@ public class DataBaseGenerator implements Database {
 
         Query exp = QueryBuilder.buildQuery(query);
 
-        if (activeDataBase == null || exp == null|| !exp.isCorrect(query))
+        if (activeDataBase == null || !exp.isCorrect(query))
             throw new SQLException("THERE IS NO AN ACTIVE DATABASE!!!");
 
         if (exp.getId() == 4)

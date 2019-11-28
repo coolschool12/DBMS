@@ -44,28 +44,22 @@ public class Row {
             return false;
         if(type==1){
             if(Operator=='='){
-                if(  ((Integer)val)  ==  ((Integer)value)  ) return true;
-                else return false;
+                return val == value;
             }else if(Operator=='>'){
-                if(  ((Integer)val)  >  ((Integer)value)  ) return true;
-                else return false;
+                return ((Integer) val) > ((Integer) value);
             }else if(Operator=='<'){
-                if(  ((Integer)val)  <  ((Integer)value)  ) return true;
-                else return false;
+                return ((Integer) val) < ((Integer) value);
             }else{
                 System.out.println("Not Supported Operator !");
                 return false;
             }
         }else if(type==0){
             if(Operator=='='){
-                if(  ((String)val).equals((String) value)  ) return true;
-                else return false;
+                return ((String) val).equals((String) value);
             }else if(Operator=='>'){
-                if(  (  (String)val  ).compareTo(  ((String)value)  )  > 0  ) return true;
-                else return false;
+                return ((String) val).compareTo(((String) value)) > 0;
             }else if(Operator=='<'){
-                if(  (  (String)val  ).compareTo(  ((String)value)  )  < 0  ) return true;
-                else return false;
+                return ((String) val).compareTo(((String) value)) < 0;
             }else{
                 System.out.println("Not Supported Operator !");
                 return false;
@@ -75,7 +69,7 @@ public class Row {
             return false;
         }
     }
-    private void checkCondition(String ColumnName,Object value) throws SQLException{
+    private void checkCondition(String ColumnName,Object value) {
         myTable.checkColumns(new String[]{ColumnName});
         myTable.checkTypes(new String[]{ColumnName}, new Object[]{value} );
     }
@@ -89,7 +83,7 @@ public class Row {
             int prevId=getId(stack.peek());
             if(id==1){
 
-                if( !(prevId==5 || prevId==2) ){
+                if(!(prevId==5 || prevId==2)){
                     stack.push("(");
                 }else
                     throw new SQLException("can't have open bracket after condtion");
