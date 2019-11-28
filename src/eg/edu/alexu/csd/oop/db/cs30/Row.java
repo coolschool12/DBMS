@@ -91,9 +91,12 @@ public class Row {
             }else if(id==2){
 
                 try {
-                    String poped= (String) stack.pop();
-                    if(!poped.equals("("))
+                    Boolean poped1= (Boolean) stack.pop();
+                    String poped2= (String) stack.pop();
+                    if(!poped2.equals("("))
                         throw new SQLException("close bracket don't match open bracket");
+                    stack.push(poped1);
+                    evaluate(stack);
                 }catch (ClassCastException e){
                     throw new SQLException("close bracket don't match open bracket");
                 }
