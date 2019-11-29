@@ -123,7 +123,7 @@ public class ExtractData {
      * @param
      * @return
      */
-    public Map<String , Object> SelectedProperties(String s) {
+   public Map<String , Object> SelectedProperties(String s) {
         s = s.toLowerCase();
         Map <String , Object> table = new HashMap<>();
 
@@ -131,19 +131,19 @@ public class ExtractData {
 
         if(s.toLowerCase().contains("*") && s.toLowerCase().contains("where")){
             table.put("starflag" , 1);
-            String[] splitQuery = s.split("(FROM|from)\\s+|\\s*(WHERE|where)\\s+|\\s*(=|<|>)\\s*");
+            String[] splitQuery = s.split("(FROM|from)\\s+|\\s*(WHERE|where)\\s+|\\s*(=|<|>)\\s*|\\s*;\\s*");
 
             table.put("tableName" , splitQuery[1]);
-            splitQuery = s.split("\\s*(WHERE|where)\\s+");
+            splitQuery = s.split("\\s*(WHERE|where)\\s+|\\s*;\\s*");
             table.put("operator" , splitQuery[1]);
 
         }
         else if(s.toLowerCase().contains("*")){
             table.put("starflag" , 1);
-            String[] splitQuery = s.split("(from|FROM)\\s*");
+            String[] splitQuery = s.split("(from|FROM)\\s*|\\s*;\\s*");
             table.put("tableName" , splitQuery[1]);
         }else if(s.toLowerCase().contains("where")){
-            String[] splitQuery = s.split("\\s*select\\s*|\\s*,\\s*|\\s*from\\s*|\\s*where\\s*");
+            String[] splitQuery = s.split("\\s*select\\s*|\\s*,\\s*|\\s*from\\s*|\\s*where\\s*|\\s*;\\s*");
 
             int i;
             for( i=1;i<=splitQuery.length-3;i++){
@@ -151,11 +151,11 @@ public class ExtractData {
             }
             table.put("sizeOfSelectedColoumns",splitQuery.length-3);
             table.put("tableName" , splitQuery[splitQuery.length-2]);
-            splitQuery = s.split("\\s*(WHERE|where)\\s+");
+            splitQuery = s.split("\\s*(WHERE|where)\\s+|\\s*;\\s*");
             table.put("operator" , splitQuery[1]);
         }
         else{
-            String[] splitQuery = s.split("[\\s,]+");
+            String[] splitQuery = s.split("[\\s,]+|\\s*;\\s*");
             int i;
             for( i=1;!splitQuery[i].equalsIgnoreCase("from");i++){
                 table.put("selectedColumn"+ i,splitQuery[i]);
@@ -172,17 +172,17 @@ public class ExtractData {
         s = s.toLowerCase();
         Map <String , Object> table = new HashMap<>();
         if(s.toLowerCase().contains("where")){
-            Pattern pattern = Pattern.compile("(FROM|from)\\s*|\\s*(WHERE|where)\\s*|\\s*(=|<|>)\\s*", Pattern.CASE_INSENSITIVE);
+            Pattern pattern = Pattern.compile("(FROM|from)\\s*|\\s*(WHERE|where)\\s*|\\s*(=|<|>)\\s*|\\s*;\\s*", Pattern.CASE_INSENSITIVE);
             String[] splitQuery = pattern.split(s);
 
 
             table.put("tableName" , splitQuery[1]);
 
-            splitQuery = s.split("\\s*(WHERE|where)\\s+");
+            splitQuery = s.split("\\s*(WHERE|where)\\s+|\\s*;\\s*");
             table.put("operator" , splitQuery[1]);
 
         }else {
-            String[] splitQuery = s.split("\\s+");
+            String[] splitQuery = s.split("\\s+|\\s*;\\s*");
             table.put("tableName" , splitQuery[2]);
         }
         return table;
@@ -192,8 +192,8 @@ public class ExtractData {
         s = s.toLowerCase();
         Map <String , Object> table = new HashMap<>();
         if(s.toLowerCase().contains("where")){
-            String[] splited  = s.split("\\s*(WHERE|where)\\s+");
-            String[] splitQuery = splited[0].split("(UPDATE|update)\\s*|\\s*(SET|set)\\s+|\\s*(=|<|>)\\s*|\\s*,\\s*");
+            String[] splited  = s.split("\\s*(WHERE|where)\\s+|\\s*;\\s*");
+            String[] splitQuery = splited[0].split("(UPDATE|update)\\s*|\\s*(SET|set)\\s+|\\s*(=|<|>)\\s*|\\s*,\\s*|\\s*;\\s*");
 
             int m =1;
             for(int j=0;j<(splitQuery.length-2);){
@@ -206,10 +206,10 @@ public class ExtractData {
 
             table.put("sizeOfSelectedColoumns" ,m-1);
             table.put("tableName" , splitQuery[1]);
-            splitQuery = s.split("\\s*(WHERE|where)\\s+");
+            splitQuery = s.split("\\s*(WHERE|where)\\s+|\\s*;\\s*");
             table.put("operator" , splitQuery[1]);
         }else {
-            String[] splitQuery = s.split("(UPDATE|update)\\s*|\\s*=\\s*|\\s*(SET|set)\\s+|\\s*,\\s*");
+            String[] splitQuery = s.split("(UPDATE|update)\\s*|\\s*=\\s*|\\s*(SET|set)\\s+|\\s*,\\s*|\\s*;\\s*");
             int m =1;
             for(int j=0;j<(splitQuery.length-2);){
                 table.put("selectedColumn"+ m,splitQuery[j+2].replaceAll("'",""));
