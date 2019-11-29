@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
  * SELECT query, id: 7
  */
 public class Select implements Query {
-    private List<String> orders;
-    private List<Integer> whichOrder; // 0: ASC, 1: DESC
+    private List<String> orders = null;
+    private List<Integer> whichOrder = null; // 0: ASC, 1: DESC
 
     @Override
     public boolean isCorrect(String query) {
@@ -28,12 +28,56 @@ public class Select implements Query {
 
     @Override
     public void execute(Database database, String query) throws SQLException {
-        Object[][] objects = database.executeQuery(query);
+
+        Object[][] objects = database.executeQuery(checkOrderBy(query));
+
+        try{
+            if (orders != null)
+            {
+                Object [][] orderedObjects = new Object[objects.length - 1][objects[0].length];
+
+                for (int i = 0; i < orderedObjects.length; i++)
+                    if (orderedObjects[i].length >= 0)
+                        System.arraycopy(objects[i + 1], 0, orderedObjects[i], 0, orderedObjects[i].length);
+
+                Object[][] finalObjects = objects;
+                Arrays.sort(objects, (o1, o2) -> {
+                    for (int i = 0; i < orders.size(); i++) {
+
+                        String order = orders.get(i);
+
+                        int col = searchForCol(order, finalObjects[0]);
+
+                        if (col == -1) throw new RuntimeException("THERE'S NO COLUMN WITH THAT NAME !!!!!!!!!!!!!");
+
+                        if (whichOrder.get(i) == 1) {
+                            if ((o1[col].toString()).compareTo(o2[col].toString()) > 0)
+                                return 1;
+
+                            else if ((o1[col].toString()).compareTo(o2[col].toString()) < 0)
+                                return -1;
+                        }
+                        else
+                        {
+                            if ((o1[col].toString()).compareTo(o2[col].toString()) > 0)
+                                return -1;
+
+                            else if ((o1[col].toString()).compareTo(o2[col].toString()) < 0)
+                                return 1;
+                        }
+                    }
+                    return 0;
+                });
+                print(objects[0]);
+                objects = orderedObjects;
+            }
+        } catch (RuntimeException e) {
+            throw new SQLException("THERE'S NO COLUMN WITH THAT NAME !!!!!!!!!!!!!!!");
+        }
 
         for (Object[] objectsArr : objects)
-        {
-            System.out.println(Arrays.toString(objectsArr));
-        }
+            print(objectsArr);
+
     }
 
     private String checkOrderBy(String query) throws SQLException {
@@ -80,5 +124,22 @@ public class Select implements Query {
         {
             return query;
         }
+    }
+
+    private int searchForCol(String col , Object[] colNames)
+    {
+        for (int i = 0; i < colNames.length; i++)
+            if (col.equalsIgnoreCase((String) colNames[i])) return i;
+
+        return -1;
+    }
+
+    private void print(Object[] row)
+    {
+        for (Object o : row) {
+            System.out.print(o + "\t");
+        }
+
+        System.out.println();
     }
 }

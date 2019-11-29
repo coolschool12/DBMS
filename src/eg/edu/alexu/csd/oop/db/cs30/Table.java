@@ -82,6 +82,9 @@ public class Table {
     private Object[][] SelectFromRows(String[] columnNames,ArrayList<Integer> selectedRows) throws RuntimeException{
         this.checkColumns(columnNames);
         Object [][] result=new Object[selectedRows.size()][columnNames.length];
+
+       // for (int i = 0; i < columnNames.length; i++) result[0][i] = columnNames[i];
+
         for(int i=0;i<selectedRows.size();i++) {
             int index=selectedRows.get(i);
             result[i]=rows.get(index).getRow(columnNames);
