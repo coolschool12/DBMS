@@ -29,6 +29,7 @@ public class UI {
                 {
                     break;
                 }
+                System.out.println();
 
                 Query query = QueryBuilder.buildQuery(queryString.toLowerCase());
                 query.execute(database, queryString.toLowerCase());
@@ -36,6 +37,8 @@ public class UI {
             catch (Exception e) {
                 System.out.println(e.getMessage());
             }
+
+            System.out.println();
         }
     }
 }

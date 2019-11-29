@@ -167,6 +167,7 @@ public class Row {
     }
 
     private String[] split(String condition){
+        condition = condition.replaceAll("(\\s*;\\s*$)", "");
         condition = condition.replaceAll("(\\s*<\\s*)", "<");
         condition = condition.replaceAll("(\\s*>\\s*)", ">");
         condition = condition.replaceAll("(\\s*=\\s*)", "=");
