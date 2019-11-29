@@ -82,7 +82,7 @@ public class DataBaseGenerator implements Database {
         if (exp.isCorrect(query) && exp.getId() == 7)
             return activeDataBase.select((HashMap<String, Object>) extractData.SelectedProperties(query));
         else
-            throw new SQLException("OPS!!");
+            throw new SQLException("you cant perform the select query");
     }
 
 
@@ -104,7 +104,7 @@ public class DataBaseGenerator implements Database {
             return activeDataBase.update((HashMap<String, Object>) extractData.UpadteProperties(query));
 
         else
-            throw new SQLException("OPS!!");
+            throw new SQLException("Query is incorrect !! ");
     }
 
 

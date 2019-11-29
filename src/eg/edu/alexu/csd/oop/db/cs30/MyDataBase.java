@@ -10,7 +10,7 @@ class MyDataBase {
     private ArrayList<String>tables;
     private String name;
     private String path;
-
+    private String realName;
     MyDataBase(String name, String dataBasePath) throws SQLException {
 
         path = dataBasePath + System.getProperty("file.separator") + name;
@@ -19,7 +19,7 @@ class MyDataBase {
         // Change name
         String pattern = Pattern.quote(System.getProperty("file.separator"));
         String[] splitName = name.split(pattern);
-        name = splitName[splitName.length - 1];
+        this.realName = splitName[splitName.length - 1];
 
         makeDataBaseFolder();
         tables = TableFactory.readDatabaseSchema(path + System.getProperty("file.separator") + name + ".xsd");
@@ -32,7 +32,7 @@ class MyDataBase {
         //Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
         TableFactory.createTable(getPath(),tableName , (String[]) Data[0], (Integer[]) Data[1]);
         tables.add(tableName);
-        TableFactory.createDatabaseSchema(tables.toArray(new String[0]), path + System.getProperty("file.separator") + name + ".xsd");
+        TableFactory.createDatabaseSchema(tables.toArray(new String[0]), path + System.getProperty("file.separator") + realName + ".xsd");
         //TableFactory.saveTable(this.getPath(), newTable);
 
         return true;
