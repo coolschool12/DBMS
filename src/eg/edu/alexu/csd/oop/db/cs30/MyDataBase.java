@@ -32,6 +32,7 @@ class MyDataBase {
         //Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
         TableFactory.createTable(getPath(),tableName , (String[]) Data[0], (Integer[]) Data[1]);
         tables.add(tableName);
+        TableFactory.createDatabaseSchema(tables.toArray(new String[0]), path + System.getProperty("file.separator") + name + ".xsd");
         //TableFactory.saveTable(this.getPath(), newTable);
 
         return true;

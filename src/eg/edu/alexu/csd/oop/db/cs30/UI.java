@@ -4,6 +4,7 @@ import eg.edu.alexu.csd.oop.db.Database;
 import eg.edu.alexu.csd.oop.db.cs30.queries.Query;
 import eg.edu.alexu.csd.oop.db.cs30.queries.QueryBuilder;
 
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class UI {
@@ -34,8 +35,14 @@ public class UI {
                 Query query = QueryBuilder.buildQuery(queryString.toLowerCase());
                 query.execute(database, queryString.toLowerCase());
             }
-            catch (Exception e) {
+            catch (SQLException e) {
                 System.out.println(e.getMessage());
+            }
+            catch (NullPointerException e) {
+                System.out.println("Error: There's no database");
+            }
+            catch (Exception e) {
+                System.out.println("Error: there's something incorrect");
             }
 
             System.out.println();
