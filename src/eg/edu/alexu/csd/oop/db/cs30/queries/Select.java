@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * SELECT query, id: 7
  */
 public class Select implements Query {
-    private List<String> orders = null;
+    private List<String> orderColumns = null;
     private List<Integer> whichOrder = null; // 0: ASC, 1: DESC
 
     @Override
@@ -32,7 +32,7 @@ public class Select implements Query {
         Object[][] objects = database.executeQuery(checkOrderBy(query));
 
         try{
-            if (orders != null)
+            if (orderColumns != null)
             {
                 Object [][] orderedObjects = new Object[objects.length - 1][objects[0].length];
 
@@ -42,9 +42,9 @@ public class Select implements Query {
 
                 Object[][] finalObjects = objects;
                 Arrays.sort(objects, (o1, o2) -> {
-                    for (int i = 0; i < orders.size(); i++) {
+                    for (int i = 0; i < orderColumns.size(); i++) {
 
-                        String order = orders.get(i);
+                        String order = orderColumns.get(i);
 
                         int col = searchForCol(order, finalObjects[0]);
 
@@ -80,45 +80,64 @@ public class Select implements Query {
 
     }
 
+    /**
+     * Check if select contains order by and find columns to order by.
+     */
     private String checkOrderBy(String query) throws SQLException {
-        Pattern pattern = Pattern.compile("(^\\s*SELECT\\s+(([^\\s]+\\s*,\\s*)*\\s*([^\\s]+)|\\*)\\s+FROM\\s+[^\\s]+((\\s+WHERE\\s+.+)|\\s*)(\\s+ORDER\\s+BY\\s+(\\s*[^\\s]+\\s*(ASC|DESC)\\s*,)*\\s*(\\s*[^\\s]+\\s*(ASC|DESC)\\s*))(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
-        Pattern splitPattern = Pattern.compile("(^\\s*SELECT\\s+(([^\\s]+\\s*,\\s*)*\\s*([^\\s]+)|\\*)\\s+FROM\\s+[^\\s]+((\\s+WHERE\\s+.+)|\\s*)((\\s+ORDER\\s+BY\\s+)|\\s*)|(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
+        Pattern orderPattern = Pattern.compile("(^\\s*SELECT\\s+(([^\\s]+\\s*,\\s*)*\\s*([^\\s]+)|\\*)\\s+FROM\\s+[^\\s]+((\\s+WHERE\\s+.+)|\\s*)\\s*(ORDER\\s*BY(\\s*[^\\s]+\\s*(ASC|DESC|\\s*)\\s*,\\s*)*\\s*[^\\s]+\\s*(ASC|DESC|\\s*)\\s*)(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
+        Pattern splitPattern = Pattern.compile("(^\\s*SELECT\\s+(([^\\s]+\\s*,\\s*)*\\s*([^\\s]+)|\\*)\\s+FROM\\s+[^\\s]+((\\s+WHERE\\s+.+)|\\s*)\\s*ORDER\\s*BY\\s*|(\\s*;\\s*|\\s*)$)", Pattern.CASE_INSENSITIVE);
 
-        if (pattern.matcher(query).matches())
+        // Contains ORDER BY
+        if (orderPattern.matcher(query).matches())
         {
-            String[] splitStrings = splitPattern.split(query);
-            if (splitStrings.length == 1)
-            {
-                String[] splitOrders = splitStrings[0].split("(\\s*,\\s*|\\s*)");
+            String[] columns = ExtractData.removeEmptyStrings(splitPattern.split(query));
 
-                orders = new ArrayList<>();
+            if (columns.length == 1)
+            {
+                String[] splitOrderColumns = columns[0].split("(\\s*,\\s*)");
+
+                // Fill order columns list
+                orderColumns = new ArrayList<>();
                 whichOrder = new ArrayList<>();
 
-                for  (int i = 0, length = splitOrders.length; i < length; i += 2)
+                for (String orderColumn : splitOrderColumns)
                 {
-                    orders.add(splitOrders[i]);
+                    String[] columnOrderSplit = ExtractData.removeEmptyStrings(orderColumn.split("\\s+"));
 
-                    if (splitOrders[i + 1].equalsIgnoreCase("ASC"))
+                    if (columnOrderSplit.length == 1)
                     {
+                        orderColumns.add(columnOrderSplit[0]);
                         whichOrder.add(0);
                     }
-                    else if (splitOrders[i + 1].equalsIgnoreCase("DESC"))
+                    else if (columnOrderSplit.length == 2)
                     {
-                        whichOrder.add(1);
+                        orderColumns.add(columnOrderSplit[0]);
+
+                        if (columnOrderSplit[1].equalsIgnoreCase("ASC"))
+                        {
+                            whichOrder.add(0);
+                        }
+                        else if (columnOrderSplit[1].equalsIgnoreCase("DESC"))
+                        {
+                            whichOrder.add(1);
+                        }
+                        else
+                        {
+                            throw new SQLException("Not ASC or DESC in ORDER BY");
+                        }
                     }
                     else
                     {
-                        whichOrder.add(0);
-                        i--;
+                        throw new SQLException("Incorrect columns in ORDER BY");
                     }
                 }
             }
             else
             {
-                throw new SQLException();
+                throw new SQLException("Incorrect ORDER BY");
             }
 
-            return query.replaceAll("(\\s+ORDER\\s+BY\\s+(\\s*[^\\s]+\\s*(ASC|DESC)\\s*,)*\\s*(\\s*[^\\s]+\\s*(ASC|DESC)\\s*))", "");
+            return Pattern.compile("(\\s*ORDER\\s*BY(\\s*[^\\s]+\\s*(ASC|DESC|\\s*)\\s*,\\s*)*\\s*[^\\s]+\\s*(ASC|DESC|\\s*)\\s*)", Pattern.CASE_INSENSITIVE).matcher(query).replaceAll("");
         }
         else
         {

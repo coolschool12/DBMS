@@ -73,12 +73,12 @@ public class ExtractData {
         // Without column names
         if (twoLists.length == 1)
         {
-            objects[0] = ExtractData.removeEmptyStrings(twoLists[0].split("(\\s*,\\s*|\\s+|\\(|\\))"));
+            objects[0] = ExtractData.removeEmptyStrings(twoLists[0].split("((\\s*\\(\\s*)|(\\s*\\)\\s*)|(\\s*(?<=('|\"|\\d))\\s*,\\s*(?=('|\"|\\d))\\s*))"));
         }
         // With column names
         else if (twoLists.length == 2)
         {
-            objects[0] = ExtractData.removeEmptyStrings(twoLists[1].split("(\\s*,\\s*|\\s+|\\(|\\))"));
+            objects[0] = ExtractData.removeEmptyStrings(twoLists[1].split("((\\s*\\(\\s*)|(\\s*\\)\\s*)|(\\s*(?<=('|\"|\\d))\\s*,\\s*(?=('|\"|\\d))\\s*))"));
             objects[1] = ExtractData.removeEmptyStrings(twoLists[0].split("(\\s*,\\s*|\\s+|\\(|\\))"));
 
             if (objects[0].length != objects[1].length)
