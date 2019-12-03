@@ -2,8 +2,6 @@ package eg.edu.alexu.csd.oop.db.cs30;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.locks.Condition;
 
 public class Table {
     private HashMap<String,Integer> map=new HashMap<>();

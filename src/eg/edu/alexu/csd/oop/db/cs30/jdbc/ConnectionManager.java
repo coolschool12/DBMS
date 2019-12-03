@@ -8,19 +8,13 @@ import java.util.Map;
 
 public class ConnectionManager {
 
-        private List<java.sql.Connection> connections;
-        private Map<java.sql.Connection, Boolean> connectionBooleanMap;
+        private static List<java.sql.Connection> connections;
+        private static Map<java.sql.Connection, Boolean> connectionBooleanMap;
         private static ConnectionManager connectionManager = null;
         private ConnectionManager()
         {
             connections = new ArrayList<>();
             connectionBooleanMap = new HashMap<>();
-            for (int i = 0; i < 5; i++)
-            {
-                Connection connection = new Connection("");
-                connections.add(connection);
-                connectionBooleanMap.put(connection, false);
-            }
         }
 
         public static ConnectionManager getInstance()
@@ -28,7 +22,18 @@ public class ConnectionManager {
             if (connectionManager == null)
                 connectionManager = new ConnectionManager();
 
+            initialize();
             return connectionManager;
+        }
+
+        private static void initialize()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                Connection connection = new Connection("");
+                connections.add(connection);
+                connectionBooleanMap.put(connection, false);
+            }
         }
 
         public java.sql.Connection getConnection(String path)
