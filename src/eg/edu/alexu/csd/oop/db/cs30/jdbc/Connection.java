@@ -7,6 +7,17 @@ import java.util.concurrent.Executor;
 
 public class Connection implements java.sql.Connection {
 
+    private String path;
+
+    Connection(String path)
+    {
+        this.path = path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
     @Override
     public Statement createStatement() throws SQLException {
 

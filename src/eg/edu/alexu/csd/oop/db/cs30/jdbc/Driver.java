@@ -1,5 +1,6 @@
 package eg.edu.alexu.csd.oop.db.cs30.jdbc;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
@@ -9,9 +10,23 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class Driver implements java.sql.Driver {
+
+    private ConnectionManager connectionManager;
+
+    Driver()
+    {
+        connectionManager = ConnectionManager.getInstance();
+    }
+
     @Override
     public Connection connect(String url, Properties info) throws SQLException {
-        return null;
+
+        if (!acceptsURL(url))
+            throw new SQLException("URL IS NOT SUPPORTED");
+
+        File file = (File) info.get("path");
+        String path = file.getAbsolutePath();
+        return connectionManager.getConnection(path);
     }
 
     @Override
@@ -45,4 +60,5 @@ public class Driver implements java.sql.Driver {
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         throw new SQLFeatureNotSupportedException();
     }
+
 }
