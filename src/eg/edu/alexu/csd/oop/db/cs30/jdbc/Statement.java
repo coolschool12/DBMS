@@ -6,6 +6,14 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 
 public class Statement implements java.sql.Statement {
+
+    private String path;
+
+    Statement(String path)
+    {
+        this.path = path;
+    }
+
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
         return null;

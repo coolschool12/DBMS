@@ -8,10 +8,12 @@ import java.util.concurrent.Executor;
 public class Connection implements java.sql.Connection {
 
     private String path;
+    private ConnectionManager connectionManager;
 
     Connection(String path)
     {
         this.path = path;
+        connectionManager = ConnectionManager.getInstance();
     }
 
     public void setPath(String path) {
@@ -21,14 +23,13 @@ public class Connection implements java.sql.Connection {
     @Override
     public Statement createStatement() throws SQLException {
 
-        Statement statement = new Statement();
-
+        Statement statement = new Statement(this.path);
         return statement;
     }
 
     @Override
     public void close() throws SQLException {
-
+        connectionManager.releaseConnection(this);
     }
 
     @Override

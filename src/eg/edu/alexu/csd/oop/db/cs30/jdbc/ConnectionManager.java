@@ -1,5 +1,6 @@
 package eg.edu.alexu.csd.oop.db.cs30.jdbc;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,10 +46,12 @@ public class ConnectionManager {
             return connection;
         }
 
-        public void releaseConnection(java.sql.Connection connection) {
+        public void releaseConnection(java.sql.Connection connection) throws SQLException {
 
             if (connectionBooleanMap.containsKey(connection))
                 connectionBooleanMap.replace(connection, false);
+            else
+                throw new SQLException("ERROR!");
 
         }
 }
