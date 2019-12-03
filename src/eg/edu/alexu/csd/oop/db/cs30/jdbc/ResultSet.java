@@ -259,7 +259,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean isAfterLast() throws SQLException {
-        if (info == null || info.getResult() == null)
+        if (isClosed() || info.getResult() == null)
             throw new SQLException("ERROR !! there is no Results!!");
 
         return cursor == info.getResult().length + 1;
@@ -267,7 +267,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean isFirst() throws SQLException {
-        if (info == null || info.getResult() == null)
+        if (isClosed() || info.getResult() == null)
             throw new SQLException("ERROR !! there is no Results!!");
 
         return cursor == 1 || cursor == (-1 * info.getResult().length);
@@ -275,7 +275,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean isLast() throws SQLException {
-        if (info == null || info.getResult() == null)
+        if (isClosed() || info.getResult() == null)
             throw new SQLException("ERROR !! there is no Results!!");
 
         return cursor == info.getResult().length || cursor == -1;
@@ -293,7 +293,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean first() throws SQLException {
-        if (info == null || info.getResult() == null)
+        if (isClosed() || info.getResult() == null)
             throw new SQLException("There is no Results");
 
         if (info.getResult().length == 0) return false;
@@ -304,7 +304,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean last() throws SQLException {
-        if (info == null || info.getResult() == null)
+        if (isClosed() || info.getResult() == null)
             throw new SQLException("There is no Results");
 
         if (info.getResult().length == 0) return false;
@@ -330,7 +330,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean previous() throws SQLException {
-        if (info == null || info.getResult() == null)
+        if (isClosed() || info.getResult() == null)
             throw new SQLException("There is no Results");
 
         if (isBeforeFirst())
