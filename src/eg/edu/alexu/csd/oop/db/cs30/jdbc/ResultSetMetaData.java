@@ -3,9 +3,17 @@ package eg.edu.alexu.csd.oop.db.cs30.jdbc;
 import java.sql.SQLException;
 
 public class ResultSetMetaData implements java.sql.ResultSetMetaData {
+
+    private selectInfo info;
+
+    ResultSetMetaData(selectInfo selectInfo)
+    {
+        this.info = selectInfo;
+    }
+
     @Override
     public int getColumnCount() throws SQLException {
-        return 0;
+        return this.info.getColumnNames().length;
     }
 
     @Override
@@ -45,12 +53,12 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
 
     @Override
     public String getColumnLabel(int column) throws SQLException {
-        return null;
+        return info.getColumnNames()[column];
     }
 
     @Override
     public String getColumnName(int column) throws SQLException {
-        return null;
+        return info.getColumnNames()[column];
     }
 
     @Override
@@ -70,7 +78,7 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
 
     @Override
     public String getTableName(int column) throws SQLException {
-        return null;
+        return info.getTableName();
     }
 
     @Override
@@ -80,7 +88,7 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
 
     @Override
     public int getColumnType(int column) throws SQLException {
-        return 0;
+        return info.getColumnTypes()[column];
     }
 
     @Override

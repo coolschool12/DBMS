@@ -4,8 +4,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.*;
 import java.sql.Statement;
+import java.sql.*;
 import java.util.Calendar;
 import java.util.Map;
 
@@ -13,9 +13,11 @@ public class ResultSet implements java.sql.ResultSet {
     private selectInfo info;
     private Statement statement;
     private int cursor;
+    private ResultSetMetaData resultSetMetaData;
     public ResultSet(selectInfo info,Statement statement){
         this.info=info;
         this.statement=statement;
+        resultSetMetaData = new ResultSetMetaData(info);
     }
     @Override
     public boolean next() throws SQLException {
@@ -209,7 +211,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        return null;
+        return resultSetMetaData;
     }
 
     @Override
@@ -249,22 +251,34 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean isBeforeFirst() throws SQLException {
-        return false;
+        if (info == null || info.getResult() == null)
+            throw new SQLException("ERROR !! there is no Results!!");
+
+        return cursor == 0;
     }
 
     @Override
     public boolean isAfterLast() throws SQLException {
-        return false;
+        if (info == null || info.getResult() == null)
+            throw new SQLException("ERROR !! there is no Results!!");
+
+        return cursor == info.getResult().length + 1;
     }
 
     @Override
     public boolean isFirst() throws SQLException {
-        return false;
+        if (info == null || info.getResult() == null)
+            throw new SQLException("ERROR !! there is no Results!!");
+
+        return cursor == 1 || cursor == (-1 * info.getResult().length);
     }
 
     @Override
     public boolean isLast() throws SQLException {
-        return false;
+        if (info == null || info.getResult() == null)
+            throw new SQLException("ERROR !! there is no Results!!");
+
+        return cursor == info.getResult().length || cursor == -1;
     }
 
     @Override
@@ -279,12 +293,24 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean first() throws SQLException {
-        return false;
+        if (info == null || info.getResult() == null)
+            throw new SQLException("There is no Results");
+
+        if (info.getResult().length == 0) return false;
+
+        cursor = 1;
+        return true;
     }
 
     @Override
     public boolean last() throws SQLException {
-        return false;
+        if (info == null || info.getResult() == null)
+            throw new SQLException("There is no Results");
+
+        if (info.getResult().length == 0) return false;
+
+        cursor = info.getResult().length;
+        return true;
     }
 
     @Override
@@ -304,7 +330,14 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean previous() throws SQLException {
-        return false;
+        if (info == null || info.getResult() == null)
+            throw new SQLException("There is no Results");
+
+        if (isBeforeFirst())
+            return false;
+
+        cursor--;
+        return true;
     }
 
     @Override
@@ -739,7 +772,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean isClosed() throws SQLException {
-        return false;
+        return info == null;
     }
 
     @Override
