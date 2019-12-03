@@ -25,7 +25,14 @@ public class ResultSet implements java.sql.ResultSet {
     }
     @Override
     public boolean next() throws SQLException {
-        return false;
+        if (isClosed() || info.getResult() == null)
+            throw new SQLException("There is no Results");
+
+        if (isAfterLast() || isLast())
+            return false;
+
+        cursor++;
+        return true;
     }
 
     @Override
@@ -337,7 +344,7 @@ public class ResultSet implements java.sql.ResultSet {
         if (isClosed() || info.getResult() == null)
             throw new SQLException("There is no Results");
 
-        if (isBeforeFirst())
+        if (isBeforeFirst() || isFirst())
             return false;
 
         cursor--;

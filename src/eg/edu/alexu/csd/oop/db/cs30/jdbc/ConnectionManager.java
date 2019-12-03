@@ -22,7 +22,6 @@ public class ConnectionManager {
             if (connectionManager == null)
                 connectionManager = new ConnectionManager();
 
-            initialize();
             return connectionManager;
         }
 

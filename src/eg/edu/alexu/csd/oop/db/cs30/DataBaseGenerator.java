@@ -139,7 +139,8 @@ public class DataBaseGenerator implements Database {
         if (exp.getId() == 2)
         {
             if (!isFound) {
-                throw new SQLException("THE TABLE DOESNT EXIST !!!!");
+                return false;
+               // throw new SQLException("THE TABLE DOESNT EXIST !!!!");
             }
             else
             {
