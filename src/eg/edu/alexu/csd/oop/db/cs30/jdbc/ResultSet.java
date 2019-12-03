@@ -10,13 +10,13 @@ import java.util.Calendar;
 import java.util.Map;
 
 public class ResultSet implements java.sql.ResultSet {
-    private selectInfo info;
+    private SelectInfo info;
     private Statement statement;
     private int cursor;
     // size = number of rows
     private int size;
     private ResultSetMetaData resultSetMetaData;
-    public ResultSet(selectInfo info,Statement statement){
+    public ResultSet(SelectInfo info, Statement statement){
         this.info=info;
         this.statement=statement;
         this.cursor=0;

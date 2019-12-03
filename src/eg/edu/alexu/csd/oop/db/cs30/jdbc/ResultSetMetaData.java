@@ -4,9 +4,9 @@ import java.sql.SQLException;
 
 public class ResultSetMetaData implements java.sql.ResultSetMetaData {
 
-    private selectInfo info;
+    private SelectInfo info;
 
-    ResultSetMetaData(selectInfo selectInfo)
+    ResultSetMetaData(SelectInfo selectInfo)
     {
         this.info = selectInfo;
     }

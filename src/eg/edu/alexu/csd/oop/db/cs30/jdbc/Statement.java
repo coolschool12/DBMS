@@ -106,7 +106,7 @@ public class Statement implements java.sql.Statement {
         String[]  columnNames = DataBaseGenerator.getSelectedColumnNames();
         Integer[] columnTypes = DataBaseGenerator.getSelectedColumnTypes();
 
-        selectInfo selectInfo = new selectInfo(selectedElements, columnNames, columnTypes, tableName);
+        SelectInfo selectInfo = new SelectInfo(selectedElements, columnNames, columnTypes, tableName);
 
         return new eg.edu.alexu.csd.oop.db.cs30.jdbc.ResultSet(selectInfo, this);
     }

@@ -1,11 +1,11 @@
 package eg.edu.alexu.csd.oop.db.cs30.jdbc;
 
-public class selectInfo {
+public class SelectInfo {
     private Object[][] result;
     private String[] columnNames;
     private Integer[] columnTypes;
     private String tableName;
-    public selectInfo(Object[][] result,String[] columnNames,Integer[] columnTypes,String tableName){
+    public SelectInfo(Object[][] result, String[] columnNames, Integer[] columnTypes, String tableName){
         this.result=result;
         this.columnNames=columnNames;
         this.columnTypes=columnTypes;
