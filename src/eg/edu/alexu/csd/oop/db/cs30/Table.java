@@ -2,8 +2,6 @@ package eg.edu.alexu.csd.oop.db.cs30;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.locks.Condition;
 
 public class Table {
     private HashMap<String,Integer> map=new HashMap<>();
@@ -83,7 +81,7 @@ public class Table {
         this.checkColumns(columnNames);
         Object [][] result=new Object[selectedRows.size()][columnNames.length];
 
-       // for (int i = 0; i < columnNames.length; i++) result[0][i] = columnNames[i];
+        DataBaseGenerator.setSelectedColumnNames(columnNames);
 
         for(int i=0;i<selectedRows.size();i++) {
             int index=selectedRows.get(i);

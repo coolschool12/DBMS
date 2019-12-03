@@ -4,8 +4,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.*;
 import java.sql.Statement;
+import java.sql.*;
 import java.util.Calendar;
 import java.util.Map;
 
@@ -13,13 +13,11 @@ public class ResultSet implements java.sql.ResultSet {
     private selectInfo info;
     private Statement statement;
     private int cursor;
-    // size = number of rows
-    private int size;
+    private ResultSetMetaData resultSetMetaData;
     public ResultSet(selectInfo info,Statement statement){
         this.info=info;
         this.statement=statement;
-        this.cursor=0;
-        this.size=info.getResult().length;
+        resultSetMetaData = new ResultSetMetaData(info);
     }
     @Override
     public boolean next() throws SQLException {
@@ -28,7 +26,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public void close() throws SQLException {
-        info=null;
+
     }
 
     @Override
@@ -38,11 +36,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public String getString(int columnIndex) throws SQLException {
-        if(info == null)
-            throw new SQLException("result set is closed");
-        if(info.getColumnTypes()[columnIndex] != 1)
-            throw new SQLException("wrong type for column "+info.getColumnNames()[columnIndex]+" wih index "+columnIndex);
-        return (String) info.getResult()[cursor][columnIndex-1];
+        return null;
     }
 
     @Override
@@ -62,11 +56,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public int getInt(int columnIndex) throws SQLException {
-        if(info == null)
-            throw new SQLException("result set is closed");
-        if(info.getColumnTypes()[columnIndex] != 1)
-            throw new SQLException("wrong type for column "+info.getColumnNames()[columnIndex]+" wih index "+columnIndex);
-        return (int) info.getResult()[cursor][columnIndex-1];
+        return 0;
     }
 
     @Override
@@ -126,10 +116,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public String getString(String columnLabel) throws SQLException {
-        if(info == null)
-            throw new SQLException("result set is closed");
-        int index=findColumn(columnLabel);
-        return getString(index);
+        return null;
     }
 
     @Override
@@ -149,10 +136,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public int getInt(String columnLabel) throws SQLException {
-        if(info == null)
-            throw new SQLException("result set is closed");
-        int index=findColumn(columnLabel);
-        return getInt(index);
+        return 0;
     }
 
     @Override
@@ -227,16 +211,12 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        return null;
+        return resultSetMetaData;
     }
 
     @Override
     public Object getObject(int columnIndex) throws SQLException {
-        if(info == null)
-            throw new SQLException("result set is closed");
-        if( columnIndex <= 0 || columnIndex > size )
-            throw new SQLException("invalid column index "+columnIndex);
-        return info.getResult()[cursor][columnIndex-1];
+        return null;
     }
 
     @Override
@@ -246,13 +226,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public int findColumn(String columnLabel) throws SQLException {
-        if(info == null)
-            throw new SQLException("result set is closed");
-        for(int i=0;i<info.getColumnNames().length;i++){
-            if(info.getColumnNames()[i].equalsIgnoreCase(columnLabel))
-                return i+1;
-        }
-        throw new SQLException("no column with label "+columnLabel+".");
+        return 0;
     }
 
     @Override
@@ -277,45 +251,66 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean isBeforeFirst() throws SQLException {
-        return false;
+        if (info == null || info.getResult() == null)
+            throw new SQLException("ERROR !! there is no Results!!");
+
+        return cursor == 0;
     }
 
     @Override
     public boolean isAfterLast() throws SQLException {
-        return false;
+        if (isClosed() || info.getResult() == null)
+            throw new SQLException("ERROR !! there is no Results!!");
+
+        return cursor == info.getResult().length + 1;
     }
 
     @Override
     public boolean isFirst() throws SQLException {
-        return false;
+        if (isClosed() || info.getResult() == null)
+            throw new SQLException("ERROR !! there is no Results!!");
+
+        return cursor == 1 || cursor == (-1 * info.getResult().length);
     }
 
     @Override
     public boolean isLast() throws SQLException {
-        return false;
+        if (isClosed() || info.getResult() == null)
+            throw new SQLException("ERROR !! there is no Results!!");
+
+        return cursor == info.getResult().length || cursor == -1;
     }
 
     @Override
     public void beforeFirst() throws SQLException {
-        cursor=0;
+
     }
 
     @Override
     public void afterLast() throws SQLException {
-        cursor=size+1;
+
     }
 
     @Override
     public boolean first() throws SQLException {
-        if(size==0)
-            return false;
-        cursor=1;
+        if (isClosed() || info.getResult() == null)
+            throw new SQLException("There is no Results");
+
+        if (info.getResult().length == 0) return false;
+
+        cursor = 1;
         return true;
     }
 
     @Override
     public boolean last() throws SQLException {
-        return false;
+        if (isClosed() || info.getResult() == null)
+            throw new SQLException("There is no Results");
+
+        if (info.getResult().length == 0) return false;
+
+        cursor = info.getResult().length;
+        return true;
     }
 
     @Override
@@ -325,23 +320,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean absolute(int row) throws SQLException {
-        if(row == 0)
-            cursor=0;
-        else if(row > 0){
-            if(row > size)
-                //put after last
-                cursor=size+1;
-            else
-                cursor=row;
-        }else{
-            if(Math.abs(row) > size)
-                //put before first
-                cursor=0;
-            else
-                //row is negative value
-                cursor=(size+1)+row;
-        }
-        return cursor <= size && cursor > 0;
+        return false;
     }
 
     @Override
@@ -351,7 +330,14 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean previous() throws SQLException {
-        return false;
+        if (isClosed() || info.getResult() == null)
+            throw new SQLException("There is no Results");
+
+        if (isBeforeFirst())
+            return false;
+
+        cursor--;
+        return true;
     }
 
     @Override
@@ -626,7 +612,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public Statement getStatement() throws SQLException {
-        return this.statement;
+        return null;
     }
 
     @Override
@@ -786,7 +772,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean isClosed() throws SQLException {
-        return false;
+        return info == null;
     }
 
     @Override

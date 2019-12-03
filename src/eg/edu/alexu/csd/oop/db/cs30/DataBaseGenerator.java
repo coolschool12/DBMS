@@ -16,6 +16,10 @@ public class DataBaseGenerator implements Database {
     private ExtractData extractData;
     private String pathToDatabases = "databases" + System.getProperty("file.separator") + ((int)(Math.random() * 100));
     private static Database database = null;
+
+    private static String[] selectedColumnNames;
+    private static Integer[] selectedColumnTypes;
+
     private DataBaseGenerator()
     {
         extractData = ExtractData.makeInstance();
@@ -107,6 +111,25 @@ public class DataBaseGenerator implements Database {
             throw new SQLException("Query is incorrect !! ");
     }
 
+    // Set column names for selection
+    static void setSelectedColumnNames(String[] selectedColumnNames) {
+        DataBaseGenerator.selectedColumnNames = selectedColumnNames;
+    }
+
+    // Return column names in select
+    public static String[] getSelectedColumnNames() {
+        return DataBaseGenerator.selectedColumnNames;
+    }
+
+    // Set types of selected columns
+    public static void setSelectedColumnTypes(Integer[] selectedColumnTypes) {
+        DataBaseGenerator.selectedColumnTypes = selectedColumnTypes;
+    }
+
+    // Return column types in select
+    public static Integer[] getSelectedColumnTypes() {
+        return DataBaseGenerator.selectedColumnTypes;
+    }
 
     private boolean dealWithDatabase(String query, Query exp) throws SQLException
     {
