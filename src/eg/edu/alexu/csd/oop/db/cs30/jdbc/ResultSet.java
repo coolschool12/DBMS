@@ -47,7 +47,11 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public String getString(int columnIndex) throws SQLException {
-        return null;
+        if(info == null)
+            throw new SQLException("result set is closed");
+        if(info.getColumnTypes()[columnIndex] != 1)
+            throw new SQLException("wrong type for column "+info.getColumnNames()[columnIndex]+" wih index "+columnIndex);
+        return (String) info.getResult()[cursor][columnIndex-1];
     }
 
     @Override
@@ -67,7 +71,11 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public int getInt(int columnIndex) throws SQLException {
-        return 0;
+        if(info == null)
+            throw new SQLException("result set is closed");
+        if(info.getColumnTypes()[columnIndex] != 1)
+            throw new SQLException("wrong type for column "+info.getColumnNames()[columnIndex]+" wih index "+columnIndex);
+        return (int) info.getResult()[cursor][columnIndex-1];
     }
 
     @Override
@@ -127,7 +135,10 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public String getString(String columnLabel) throws SQLException {
-        return null;
+        if(info == null)
+            throw new SQLException("result set is closed");
+        int index=findColumn(columnLabel);
+        return getString(index);
     }
 
     @Override
@@ -147,7 +158,10 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public int getInt(String columnLabel) throws SQLException {
-        return 0;
+        if(info == null)
+            throw new SQLException("result set is closed");
+        int index=findColumn(columnLabel);
+        return getInt(index);
     }
 
     @Override
@@ -227,7 +241,11 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public Object getObject(int columnIndex) throws SQLException {
-        return null;
+        if(info == null)
+            throw new SQLException("result set is closed");
+        if( columnIndex <= 0 || columnIndex > size )
+            throw new SQLException("invalid column index "+columnIndex);
+        return info.getResult()[cursor][columnIndex-1];
     }
 
     @Override
@@ -237,7 +255,13 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public int findColumn(String columnLabel) throws SQLException {
-        return 0;
+        if(info == null)
+            throw new SQLException("result set is closed");
+        for(int i=0;i<info.getColumnNames().length;i++){
+            if(info.getColumnNames()[i].equalsIgnoreCase(columnLabel))
+                return i+1;
+        }
+        throw new SQLException("no column with label "+columnLabel+".");
     }
 
     @Override
@@ -294,12 +318,12 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public void beforeFirst() throws SQLException {
-
+        cursor=0;
     }
 
     @Override
     public void afterLast() throws SQLException {
-
+        cursor=size+1;
     }
 
     @Override
@@ -331,7 +355,23 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public boolean absolute(int row) throws SQLException {
-        return false;
+        if(row == 0)
+            cursor=0;
+        else if(row > 0){
+            if(row > size)
+                //put after last
+                cursor=size+1;
+            else
+                cursor=row;
+        }else{
+            if(Math.abs(row) > size)
+                //put before first
+                cursor=0;
+            else
+                //row is negative value
+                cursor=(size+1)+row;
+        }
+        return cursor <= size && cursor > 0;
     }
 
     @Override
@@ -623,7 +663,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public Statement getStatement() throws SQLException {
-        return null;
+        return this.statement;
     }
 
     @Override
