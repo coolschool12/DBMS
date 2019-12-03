@@ -22,9 +22,7 @@ public class Connection implements java.sql.Connection {
 
     @Override
     public Statement createStatement() throws SQLException {
-
-        Statement statement = new Statement(this.path);
-        return statement;
+        return new Statement(this.path, this);
     }
 
     @Override

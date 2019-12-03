@@ -83,7 +83,7 @@ public class Table {
         this.checkColumns(columnNames);
         Object [][] result=new Object[selectedRows.size()][columnNames.length];
 
-       // for (int i = 0; i < columnNames.length; i++) result[0][i] = columnNames[i];
+        DataBaseGenerator.setSelectedColumnNames(columnNames);
 
         for(int i=0;i<selectedRows.size();i++) {
             int index=selectedRows.get(i);
