@@ -18,7 +18,7 @@ public class DataBaseGenerator implements Database {
     private static Database database = null;
 
     private static String[] selectedColumnNames;
-    private static String[] selectedColumnTypes;
+    private static Integer[] selectedColumnTypes;
 
     private DataBaseGenerator()
     {
@@ -117,17 +117,17 @@ public class DataBaseGenerator implements Database {
     }
 
     // Return column names in select
-    public String[] getSelectedColumnNames() {
+    public static String[] getSelectedColumnNames() {
         return DataBaseGenerator.selectedColumnNames;
     }
 
     // Set types of selected columns
-    public static void setSelectedColumnTypes(String[] selectedColumnTypes) {
+    public static void setSelectedColumnTypes(Integer[] selectedColumnTypes) {
         DataBaseGenerator.selectedColumnTypes = selectedColumnTypes;
     }
 
     // Return column types in select
-    public String[] getSelectedColumnTypes() {
+    public static Integer[] getSelectedColumnTypes() {
         return DataBaseGenerator.selectedColumnTypes;
     }
 

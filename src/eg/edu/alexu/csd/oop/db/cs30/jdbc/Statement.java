@@ -2,6 +2,7 @@ package eg.edu.alexu.csd.oop.db.cs30.jdbc;
 
 import eg.edu.alexu.csd.oop.db.Database;
 import eg.edu.alexu.csd.oop.db.cs30.DataBaseGenerator;
+import eg.edu.alexu.csd.oop.db.cs30.queries.ExtractData;
 import eg.edu.alexu.csd.oop.db.cs30.queries.Query;
 import eg.edu.alexu.csd.oop.db.cs30.queries.QueryBuilder;
 
@@ -96,14 +97,17 @@ public class Statement implements java.sql.Statement {
 
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
-        Object[][] selectedElements;  // 2d array from select statement
-        String[] columnNames;
-        String[] columnTypes;
+        ExtractData extractData = ExtractData.makeInstance();
 
-        selectedElements = database.executeQuery(sql);
+        Object[][] selectedElements = database.executeQuery(sql);
 
-        ResultSet resultSet = new eg.edu.alexu.csd.oop.db.cs30.jdbc.ResultSet();
-        return resultSet;
+        String tableName = extractData.getTableName(sql);
+        String[]  columnNames = DataBaseGenerator.getSelectedColumnNames();
+        Integer[] columnTypes = DataBaseGenerator.getSelectedColumnTypes();
+
+        selectInfo selectInfo = new selectInfo(selectedElements, columnNames, columnTypes, tableName);
+
+        return new eg.edu.alexu.csd.oop.db.cs30.jdbc.ResultSet(selectInfo, this);
     }
 
     @Override
