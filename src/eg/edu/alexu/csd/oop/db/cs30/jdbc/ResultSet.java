@@ -28,11 +28,10 @@ public class ResultSet implements java.sql.ResultSet {
         if (isClosed() || info.getResult() == null)
             throw new SQLException("There is no Results");
 
-        if (isAfterLast() || isLast())
-            return false;
+        if (cursor <= this.size)
+            cursor++;
 
-        cursor++;
-        return true;
+        return cursor <= this.size;
     }
 
     @Override
@@ -245,7 +244,7 @@ public class ResultSet implements java.sql.ResultSet {
             throw new SQLException("result set is closed");
         if( columnIndex <= 0 || columnIndex > size )
             throw new SQLException("invalid column index "+columnIndex);
-        return info.getResult()[cursor][columnIndex-1];
+        return info.getResult()[cursor - 1][columnIndex-1];
     }
 
     @Override
@@ -384,11 +383,10 @@ public class ResultSet implements java.sql.ResultSet {
         if (isClosed() || info.getResult() == null)
             throw new SQLException("There is no Results");
 
-        if (isBeforeFirst() || isFirst())
-            return false;
+        if (cursor > 0)
+            cursor--;
 
-        cursor--;
-        return true;
+        return cursor > 0;
     }
 
     @Override
