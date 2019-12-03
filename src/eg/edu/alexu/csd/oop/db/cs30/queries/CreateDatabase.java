@@ -31,4 +31,9 @@ public class CreateDatabase implements Query {
             System.out.println("Error while creating database.");
         }
     }
+
+    @Override
+    public boolean executeWithoutPrinting(Database database, String query) throws SQLException {
+        return database.executeStructureQuery(query);
+    }
 }

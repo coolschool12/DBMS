@@ -31,4 +31,9 @@ public class DropDatabase implements Query {
             System.out.println("Error while dropping database.");
         }
     }
+
+    @Override
+    public boolean executeWithoutPrinting(Database database, String query) throws SQLException {
+        return database.executeStructureQuery(query);
+    }
 }

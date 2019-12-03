@@ -25,4 +25,9 @@ public class Update implements Query {
         int numberOfRows = database.executeUpdateQuery(query);
         System.out.println(numberOfRows + " rows were changed.");
     }
+
+    @Override
+    public boolean executeWithoutPrinting(Database database, String query) throws SQLException {
+        return database.executeUpdateQuery(query) > 0;
+    }
 }

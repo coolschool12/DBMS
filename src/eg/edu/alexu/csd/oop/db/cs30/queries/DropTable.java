@@ -31,4 +31,9 @@ public class DropTable implements Query {
             System.out.println("Error while dropping table.");
         }
     }
+
+    @Override
+    public boolean executeWithoutPrinting(Database database, String query) throws SQLException {
+        return database.executeStructureQuery(query);
+    }
 }

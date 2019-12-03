@@ -23,4 +23,6 @@ public interface Query {
      * Execute query's operation, and print output
      */
     void execute(Database database, String query) throws SQLException;
+
+    boolean executeWithoutPrinting(Database database, String query) throws SQLException;
 }

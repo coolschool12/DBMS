@@ -92,7 +92,8 @@ public class Statement implements java.sql.Statement {
 
     @Override
     public boolean execute(String sql) throws SQLException {
-        return database.executeStructureQuery(sql);
+        Query query = QueryBuilder.buildQuery(sql);
+        return query.executeWithoutPrinting(database, sql);
     }
 
     @Override

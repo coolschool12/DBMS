@@ -80,6 +80,11 @@ public class Select implements Query {
 
     }
 
+    @Override
+    public boolean executeWithoutPrinting(Database database, String query) throws SQLException {
+        return database.executeQuery(query).length > 0;
+    }
+
     /**
      * Check if select contains order by and find columns to order by.
      */
