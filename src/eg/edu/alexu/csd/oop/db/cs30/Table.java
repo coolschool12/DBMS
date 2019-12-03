@@ -83,6 +83,14 @@ public class Table {
 
         DataBaseGenerator.setSelectedColumnNames(columnNames);
 
+        Integer[] columnTypes = new Integer[columnNames.length];
+        for (int i = 0, length = columnNames.length; i < length; i++)
+        {
+            columnTypes[i] = map.get(columnNames[i]);
+        }
+
+        DataBaseGenerator.setSelectedColumnTypes(columnTypes);
+
         for(int i=0;i<selectedRows.size();i++) {
             int index=selectedRows.get(i);
             result[i]=rows.get(index).getRow(columnNames);
