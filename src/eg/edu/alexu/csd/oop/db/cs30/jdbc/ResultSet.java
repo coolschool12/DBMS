@@ -10,6 +10,13 @@ import java.util.Calendar;
 import java.util.Map;
 
 public class ResultSet implements java.sql.ResultSet {
+    private selectInfo info;
+    private Statement statement;
+    private int cursor;
+    public ResultSet(selectInfo info,Statement statement){
+        this.info=info;
+        this.statement=statement;
+    }
     @Override
     public boolean next() throws SQLException {
         return false;
