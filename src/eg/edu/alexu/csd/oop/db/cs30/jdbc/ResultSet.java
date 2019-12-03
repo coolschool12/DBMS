@@ -13,10 +13,14 @@ public class ResultSet implements java.sql.ResultSet {
     private selectInfo info;
     private Statement statement;
     private int cursor;
+    // size = number of rows
+    private int size;
     private ResultSetMetaData resultSetMetaData;
     public ResultSet(selectInfo info,Statement statement){
         this.info=info;
         this.statement=statement;
+        this.cursor=0;
+        this.size=info.getResult().length;
         resultSetMetaData = new ResultSetMetaData(info);
     }
     @Override
