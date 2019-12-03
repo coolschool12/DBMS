@@ -50,7 +50,7 @@ public class ResultSet implements java.sql.ResultSet {
             throw new SQLException("result set is closed");
         if(info.getColumnTypes()[columnIndex] != 1)
             throw new SQLException("wrong type for column "+info.getColumnNames()[columnIndex]+" wih index "+columnIndex);
-        return (String) info.getResult()[cursor][columnIndex-1];
+        return (String) info.getResult()[cursor-1][columnIndex-1];
     }
 
     @Override
@@ -74,7 +74,7 @@ public class ResultSet implements java.sql.ResultSet {
             throw new SQLException("result set is closed");
         if(info.getColumnTypes()[columnIndex] != 1)
             throw new SQLException("wrong type for column "+info.getColumnNames()[columnIndex]+" wih index "+columnIndex);
-        return (int) info.getResult()[cursor][columnIndex-1];
+        return (int) info.getResult()[cursor-1][columnIndex-1];
     }
 
     @Override
