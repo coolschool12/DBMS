@@ -16,6 +16,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -213,12 +214,12 @@ public class TableFactory {
         doc.getDocumentElement().normalize();
         Element root=doc.getDocumentElement();
         NodeList rows=root.getChildNodes();
-        for(int i = 0 ;  i < rows.getLength()  ; i++) if (rows.item(i).getNodeType() == Node.ELEMENT_NODE){
+        for(int i = 0 ;  i < rows.getLength() && threadInterrupted()  ; i++) if (rows.item(i).getNodeType() == Node.ELEMENT_NODE){
             ArrayList<String> coulmnNames=new ArrayList<>();
             ArrayList<String> values=new ArrayList<>();
             Element row= (Element) rows.item(i);
             NodeList tags=row.getChildNodes();
-            for(int j = 0; j < tags.getLength();  j++) if (tags.item(j).getNodeType() == Node.ELEMENT_NODE){
+            for(int j = 0; j < tags.getLength() && threadInterrupted();  j++) if (tags.item(j).getNodeType() == Node.ELEMENT_NODE){
                 Element tag= (Element) tags.item(j);
                 coulmnNames.add(tag.getTagName());
                 values.add(tag.getTextContent());
@@ -246,7 +247,7 @@ public class TableFactory {
 
             // Find all elements
             NodeList elements = xmlDocument.getElementsByTagName("element");
-            for (int i = 0; i < elements.getLength(); i++)
+            for (int i = 0; i < elements.getLength() && threadInterrupted(); i++)
             {
                 if (elements.item(i).getNodeType() == Node.ELEMENT_NODE)
                 {
@@ -325,8 +326,7 @@ public class TableFactory {
         return documentBuilder.newDocument();
     }
 
-    private static void saveCellstoXml(Table table, Document doc)
-    {
+    private static void saveCellstoXml(Table table, Document doc) throws SQLException {
         Element rootElement = doc.createElement("rows");
         doc.appendChild(rootElement);
 
@@ -335,7 +335,7 @@ public class TableFactory {
 
         for (Object[] objects : valuesOfTheTable) {
             Element row = doc.createElement("row");
-            for (int i = 0; i < objects.length; i++) {
+            for (int i = 0; i < objects.length && threadInterrupted(); i++) {
                 if (objects[i] != null) {
 
                     Element cell = doc.createElement(tableColumnNames[i]);
@@ -347,7 +347,9 @@ public class TableFactory {
         }
     }
 
-    private static void writeToFile(String xmlPath, Document document) throws TransformerException {
+    private static void writeToFile(String xmlPath, Document document) throws TransformerException, SQLException {
+
+        threadInterrupted();
 
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
@@ -357,6 +359,14 @@ public class TableFactory {
         StreamResult streamResult = new StreamResult(new File(xmlPath));
 
         transformer.transform(domSource, streamResult);
+    }
+
+    public static boolean threadInterrupted () throws SQLException {
+        if (Thread.interrupted())
+            throw new SQLTimeoutException("Time EXCEEDED !! ");
+        else
+            return true;
+
     }
 
 
