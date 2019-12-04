@@ -6,6 +6,7 @@ import eg.edu.alexu.csd.oop.db.cs30.queries.Query;
 import eg.edu.alexu.csd.oop.db.cs30.queries.QueryBuilder;
 
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -133,6 +134,7 @@ public class DataBaseGenerator implements Database {
 
     private boolean dealWithDatabase(String query, Query exp) throws SQLException
     {
+        MyDataBase oldActiveDatabase = this.activeDataBase;
         String dataBaseName = extractData.getDatabaseName(query);
         boolean isFound = searchForThatName(dataBaseName);
 
@@ -151,13 +153,18 @@ public class DataBaseGenerator implements Database {
             }
         }
         else if (exp.getId() == 0) {
-            if (!isFound) {
-                activeDataBase = new MyDataBase(dataBaseName, pathToDatabases);
-                dataBases.add(activeDataBase);
-                return true;
+            try {
+                if (!isFound) {
+                    activeDataBase = new MyDataBase(dataBaseName, pathToDatabases);
+                    dataBases.add(activeDataBase);
+                    return true;
+                }
+                else
+                    return true;
             }
-            else
-                return true;
+            catch (SQLTimeoutException e) {
+                this.activeDataBase = oldActiveDatabase;
+            }
         }
         return false;
     }

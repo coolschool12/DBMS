@@ -2,6 +2,7 @@ package eg.edu.alexu.csd.oop.db.cs30;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
@@ -27,13 +28,19 @@ class MyDataBase {
 
     boolean addTable(Object[][] Data, String tableName) throws SQLException
     {
-        if (checkTable(tableName)) return false;
+        try {
+            if (checkTable(tableName)) return false;
 
-        //Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
-        TableFactory.createTable(getPath(),tableName , (String[]) Data[0], (Integer[]) Data[1]);
-        tables.add(tableName);
-        TableFactory.createDatabaseSchema(tables.toArray(new String[0]), path + System.getProperty("file.separator") + realName + ".xsd");
-        //TableFactory.saveTable(this.getPath(), newTable);
+            //Table newTable = new Table((String[]) Data[0], (Integer[]) Data[1]);
+            TableFactory.createTable(getPath(),tableName , (String[]) Data[0], (Integer[]) Data[1]);
+            tables.add(tableName);
+            TableFactory.createDatabaseSchema(tables.toArray(new String[0]), path + System.getProperty("file.separator") + realName + ".xsd");
+            //TableFactory.saveTable(this.getPath(), newTable);
+        }
+        catch (SQLTimeoutException e) {
+            tables.remove(tableName);
+            throw e;
+        }
 
         return true;
     }
