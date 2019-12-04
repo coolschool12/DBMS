@@ -74,17 +74,7 @@ public class Statement implements java.sql.Statement {
             }
 
             executorService.shutdownNow();
-
-            // If an exception was thrown
-            if (this.sqlException != null)
-            {
-                SQLException e = this.sqlException;
-
-                // Reset sqlException
-                this.sqlException = null;
-
-                throw e;
-            }
+            this.checkException();
         }
         // There's no timeout
         else
@@ -155,15 +145,22 @@ public class Statement implements java.sql.Statement {
         Query query = QueryBuilder.buildQuery(sql);
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<Boolean> future = executor.submit(() -> query.executeWithoutPrinting(database, sql));
+        Future<Boolean> future = executor.submit(() -> {
+            try {
+                return query.executeWithoutPrinting(database, sql);
+            }
+            catch (SQLException e) {
+                Statement.this.sqlException = e;
+                return false;
+            }
+        });
 
-        boolean flag;
+        boolean flag = false;
         try{
-             flag = future.get(getQueryTimeout(), TimeUnit.SECONDS);
+            flag = future.get(getQueryTimeout(), TimeUnit.SECONDS);
         } catch (TimeoutException | InterruptedException | ExecutionException | SQLException e) {
 
             future.cancel(true);
-            flag = false;
 
             if (e instanceof SQLTimeoutException)
                 throw new SQLTimeoutException("Time Exceeded ");
@@ -173,6 +170,10 @@ public class Statement implements java.sql.Statement {
 
         }
         executor.shutdownNow();
+
+        // If an exception was thrown
+        this.checkException();
+
         return flag;
     }
 
@@ -197,14 +198,7 @@ public class Statement implements java.sql.Statement {
         executor.shutdownNow();
 
         // If an exception was thrown
-        if (this.sqlException != null)
-        {
-            SQLException e = this.sqlException;
-
-            // Reset sqlException
-            this.sqlException = null;
-            throw e;
-        }
+        this.checkException();
 
         return resultSet;
     }
@@ -247,6 +241,15 @@ public class Statement implements java.sql.Statement {
         executorService.shutdownNow();
 
         // If an exception was thrown
+        this.checkException();
+
+        return result;
+    }
+
+    /**
+     * Checks if an exception was thrown
+     */
+    private void checkException() throws SQLException {
         if (this.sqlException != null)
         {
             SQLException e = this.sqlException;
@@ -255,8 +258,6 @@ public class Statement implements java.sql.Statement {
             this.sqlException = null;
             throw e;
         }
-
-        return result;
     }
 
     @Override
