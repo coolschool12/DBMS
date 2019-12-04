@@ -6,12 +6,13 @@ import eg.edu.alexu.csd.oop.db.cs30.queries.ExtractData;
 import eg.edu.alexu.csd.oop.db.cs30.queries.Query;
 import eg.edu.alexu.csd.oop.db.cs30.queries.QueryBuilder;
 
+import java.sql.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
+import java.time.Duration;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.*;
 
 public class Statement implements java.sql.Statement {
 
@@ -93,11 +94,52 @@ public class Statement implements java.sql.Statement {
     @Override
     public boolean execute(String sql) throws SQLException {
         Query query = QueryBuilder.buildQuery(sql);
-        return query.executeWithoutPrinting(database, sql);
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<Boolean> future = executor.submit(() -> query.executeWithoutPrinting(database, sql));
+
+        boolean flag = false;
+        try{
+             flag = future.get(getQueryTimeout(), TimeUnit.SECONDS);
+        } catch (TimeoutException | InterruptedException | ExecutionException | SQLException e) {
+
+            future.cancel(true);
+
+            if (e instanceof SQLTimeoutException)
+                throw new SQLTimeoutException("Time Exceeded ");
+
+            else if (e instanceof SQLException)
+                throw new SQLException(String.valueOf(((SQLException) e).getErrorCode()));
+
+        }
+        executor.shutdownNow();
+        return flag;
     }
 
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<ResultSet> future = executor.submit(() -> this.executeQueryInThread(sql));
+
+        ResultSet resultSet = null;
+        try{
+            resultSet = future.get(getQueryTimeout(), TimeUnit.SECONDS);
+        } catch (TimeoutException | InterruptedException | ExecutionException | SQLException e) {
+
+            future.cancel(true);
+
+            if (e instanceof SQLTimeoutException)
+                throw new SQLTimeoutException("Time Exceeded !!");
+
+            else if (e instanceof SQLException)
+                throw new SQLException(String.valueOf(((SQLException) e).getErrorCode()));
+
+        }
+        executor.shutdownNow();
+        return resultSet;
+    }
+
+    private ResultSet executeQueryInThread(String sql) throws SQLException {
         ExtractData extractData = ExtractData.makeInstance();
 
         Object[][] selectedElements = database.executeQuery(sql);
