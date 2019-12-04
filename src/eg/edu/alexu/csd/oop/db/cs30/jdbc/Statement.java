@@ -6,12 +6,12 @@ import eg.edu.alexu.csd.oop.db.cs30.queries.ExtractData;
 import eg.edu.alexu.csd.oop.db.cs30.queries.Query;
 import eg.edu.alexu.csd.oop.db.cs30.queries.QueryBuilder;
 
+import java.sql.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.*;
 
 public class Statement implements java.sql.Statement {
 
@@ -20,6 +20,7 @@ public class Statement implements java.sql.Statement {
     private Queue<String> batches;
     private Connection connection;
     private int timeoutSeconds;
+    private SQLException sqlException;
 
     Statement(String path, Connection connection) {
         this.path = path;
@@ -43,51 +44,109 @@ public class Statement implements java.sql.Statement {
         // Execute each query in batches
         int[] executeBatches = new int[batches.size()];
 
-        for (int i = 0, length = batches.size(); i < length; i++)
+        // There's a timeout
+        if (this.timeoutSeconds != 0)
         {
-            Query query = QueryBuilder.buildQuery(batches.element());
+            ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
-            // Structure query
-            if (query.getId() == 0 || query.getId() == 1 ||query.getId() == 2 || query.getId() == 3)
-            {
-                try {
-                    if (database.executeStructureQuery(batches.remove()))
+            Future<String> handler = executorService.submit(new Callable<String>() {
+                @Override
+                public String call() throws Exception {
+                    for (int i = 0, length = batches.size(); i < length && !Thread.interrupted(); i++)
                     {
-                        executeBatches[i] = Statement.SUCCESS_NO_INFO;
+                        try {
+                            executeBatches[i] = Statement.this.executeBatchQuery();
+                        }
+                        catch (SQLException e) {
+                            Statement.this.sqlException = e;
+                        }
                     }
-                    else
-                    {
-                        executeBatches[i] = Statement.EXECUTE_FAILED;
-                    }
+                    return null;
                 }
-                catch (SQLException e) {
-                    executeBatches[i] = Statement.EXECUTE_FAILED;
-                }
+            });
+
+            try {
+                handler.get(timeoutSeconds, TimeUnit.SECONDS);
             }
-            // Insert, delete and update
-            else if (query.getId() == 4 || query.getId() == 5 || query.getId() == 6)
-            {
-                try {
-                    executeBatches[i] = database.executeUpdateQuery(batches.remove());
-                }
-                catch (SQLException e) {
-                    executeBatches[i] = Statement.EXECUTE_FAILED;
-                }
+            catch (Exception e) {
+                handler.cancel(true);
             }
-            // Select
-            else
+
+            executorService.shutdownNow();
+
+            // If an exception was thrown
+            if (this.sqlException != null)
             {
-                try {
-                    database.executeQuery(batches.remove());
-                    executeBatches[i] = Statement.SUCCESS_NO_INFO;
-                }
-                catch (SQLException e) {
-                    executeBatches[i] = Statement.EXECUTE_FAILED;
-                }
+                SQLException e = this.sqlException;
+
+                // Reset sqlException
+                this.sqlException = null;
+
+                throw e;
+            }
+        }
+        // There's no timeout
+        else
+        {
+            for (int i = 0, length = batches.size(); i < length; i++)
+            {
+                executeBatches[i] = this.executeBatchQuery();
             }
         }
 
         return executeBatches;
+    }
+
+    private int executeBatchQuery() throws SQLException {
+        Query query = QueryBuilder.buildQuery(batches.element());
+
+        // Structure query
+        if (query.getId() == 0 || query.getId() == 1 ||query.getId() == 2 || query.getId() == 3)
+        {
+            try {
+                if (database.executeStructureQuery(batches.remove()))
+                {
+                    return Statement.SUCCESS_NO_INFO;
+                }
+                else
+                {
+                    return Statement.EXECUTE_FAILED;
+                }
+            }
+            catch (SQLTimeoutException e) {
+                throw e;
+            }
+            catch (SQLException e) {
+                return Statement.EXECUTE_FAILED;
+            }
+        }
+        // Insert, delete and update
+        else if (query.getId() == 4 || query.getId() == 5 || query.getId() == 6)
+        {
+            try {
+                return database.executeUpdateQuery(batches.remove());
+            }
+            catch (SQLTimeoutException e) {
+                throw e;
+            }
+            catch (SQLException e) {
+                return Statement.EXECUTE_FAILED;
+            }
+        }
+        // Select
+        else
+        {
+            try {
+                database.executeQuery(batches.remove());
+                return Statement.SUCCESS_NO_INFO;
+            }
+            catch (SQLTimeoutException e) {
+                throw e;
+            }
+            catch (SQLException e) {
+                return Statement.EXECUTE_FAILED;
+            }
+        }
     }
 
     @Override
@@ -113,7 +172,48 @@ public class Statement implements java.sql.Statement {
 
     @Override
     public int executeUpdate(String sql) throws SQLException {
-        return database.executeUpdateQuery(sql);
+        Integer result = 0;
+        if (this.timeoutSeconds != 0)
+        {
+            ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+            Future<Integer> handler = executorService.submit(new Callable<Integer>() {
+                @Override
+                public Integer call() throws Exception {
+                    try {
+                        return database.executeUpdateQuery(sql);
+                    }
+                    catch (SQLException e) {
+                        Statement.this.sqlException = e;
+                        return 0;
+                    }
+                }
+            });
+
+            try {
+                result = handler.get(timeoutSeconds, TimeUnit.SECONDS);
+            }
+            catch (Exception e) {
+                handler.cancel(true);
+            }
+
+            executorService.shutdownNow();
+
+            // If an exception was thrown
+            if (this.sqlException != null)
+            {
+                SQLException e = this.sqlException;
+
+                // Reset sqlException
+                this.sqlException = null;
+                throw e;
+            }
+        }
+        else
+        {
+            result = database.executeUpdateQuery(sql);
+        }
+
+        return result;
     }
 
     @Override
