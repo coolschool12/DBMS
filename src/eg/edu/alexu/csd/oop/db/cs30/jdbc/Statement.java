@@ -27,6 +27,7 @@ public class Statement implements java.sql.Statement {
         this.batches = new LinkedList<>();
         this.database = DataBaseGenerator.makeInstance();
         this.connection = connection;
+        timeoutSeconds = Integer.MAX_VALUE;
     }
 
     @Override
@@ -45,7 +46,7 @@ public class Statement implements java.sql.Statement {
         int[] executeBatches = new int[batches.size()];
 
         // There's a timeout
-        if (this.timeoutSeconds != 0)
+        if (this.timeoutSeconds != Integer.MAX_VALUE)
         {
             ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
@@ -214,44 +215,38 @@ public class Statement implements java.sql.Statement {
     @Override
     public int executeUpdate(String sql) throws SQLException {
         Integer result = 0;
-        if (this.timeoutSeconds != 0)
-        {
-            ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-            Future<Integer> handler = executorService.submit(new Callable<Integer>() {
-                @Override
-                public Integer call() throws Exception {
-                    try {
-                        return database.executeUpdateQuery(sql);
-                    }
-                    catch (SQLException e) {
-                        Statement.this.sqlException = e;
-                        return 0;
-                    }
+
+        ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        Future<Integer> handler = executorService.submit(new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                try {
+                    return database.executeUpdateQuery(sql);
                 }
-            });
-
-            try {
-                result = handler.get(timeoutSeconds, TimeUnit.SECONDS);
+                catch (SQLException e) {
+                    Statement.this.sqlException = e;
+                    return 0;
+                }
             }
-            catch (Exception e) {
-                handler.cancel(true);
-            }
+        });
 
-            executorService.shutdownNow();
-
-            // If an exception was thrown
-            if (this.sqlException != null)
-            {
-                SQLException e = this.sqlException;
-
-                // Reset sqlException
-                this.sqlException = null;
-                throw e;
-            }
+        try {
+            result = handler.get(timeoutSeconds, TimeUnit.SECONDS);
         }
-        else
+        catch (Exception e) {
+            handler.cancel(true);
+        }
+
+        executorService.shutdownNow();
+
+        // If an exception was thrown
+        if (this.sqlException != null)
         {
-            result = database.executeUpdateQuery(sql);
+            SQLException e = this.sqlException;
+
+            // Reset sqlException
+            this.sqlException = null;
+            throw e;
         }
 
         return result;
@@ -269,7 +264,12 @@ public class Statement implements java.sql.Statement {
 
     @Override
     public void setQueryTimeout(int seconds) throws SQLException {
-        this.timeoutSeconds = seconds;
+
+        if (seconds == 0)
+            this.timeoutSeconds = Integer.MAX_VALUE;
+
+        else
+            this.timeoutSeconds = seconds;
     }
 
     @Override
