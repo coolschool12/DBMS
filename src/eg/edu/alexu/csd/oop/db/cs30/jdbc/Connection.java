@@ -1,5 +1,8 @@
 package eg.edu.alexu.csd.oop.db.cs30.jdbc;
 
+import eg.edu.alexu.csd.oop.db.Database;
+import eg.edu.alexu.csd.oop.db.cs30.DataBaseGenerator;
+
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
@@ -9,9 +12,10 @@ public class Connection implements java.sql.Connection {
 
     private String path;
     private ConnectionManager connectionManager;
-
+    private Database database;
     Connection(String path)
     {
+        database = DataBaseGenerator.makeInstance();
         this.path = path;
         connectionManager = ConnectionManager.getInstance();
     }
@@ -22,6 +26,7 @@ public class Connection implements java.sql.Connection {
 
     @Override
     public Statement createStatement() throws SQLException {
+        ((DataBaseGenerator)database).setPathToDatabases(path);
         return new Statement(this.path, this);
     }
 

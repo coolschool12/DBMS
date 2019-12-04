@@ -35,6 +35,10 @@ public class DataBaseGenerator implements Database {
         return database;
     }
 
+    public void setPathToDatabases(String pathToDatabases) {
+        this.pathToDatabases = pathToDatabases;
+    }
+
     @Override
     public String createDatabase(String databaseName, boolean dropIfExists) {
 
