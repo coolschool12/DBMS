@@ -5,7 +5,9 @@ import java.sql.Connection;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Enumeration;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -38,7 +40,15 @@ public class Driver implements java.sql.Driver {
 
     @Override
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) throws SQLException {
-        return new DriverPropertyInfo[0];
+
+        Set<String> keys = info.stringPropertyNames();
+        int i = 0;
+        DriverPropertyInfo[] propertyInfo = new DriverPropertyInfo[info.size()];
+        for (String key : keys) {
+            propertyInfo[i++] = new DriverPropertyInfo(key, info.getProperty(key));
+        }
+
+        return propertyInfo;
     }
 
     @Override
