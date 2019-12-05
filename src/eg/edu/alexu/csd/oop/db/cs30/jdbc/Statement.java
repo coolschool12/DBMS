@@ -49,28 +49,29 @@ public class Statement implements java.sql.Statement {
         if (this.timeoutSeconds != Integer.MAX_VALUE)
         {
             ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
-            Future<String> handler = executorService.submit(new Callable<String>() {
-                @Override
-                public String call() throws Exception {
-                    for (int i = 0, length = batches.size(); i < length && !Thread.interrupted(); i++)
-                    {
-                        try {
-                            executeBatches[i] = Statement.this.executeBatchQuery();
-                        }
-                        catch (SQLException e) {
-                            Statement.this.sqlException = e;
-                        }
-                    }
-                    return null;
+            Future<String> handler = executorService.submit(() ->
+            {
+                for (int i = 0, length = batches.size(); i < length && !Thread.interrupted(); i++)
+                {
+                    executeBatches[i] = Statement.this.executeBatchQuery();
                 }
+                return null;
             });
 
             try {
                 handler.get(timeoutSeconds, TimeUnit.SECONDS);
             }
-            catch (Exception e) {
+            catch (TimeoutException e) {
                 handler.cancel(true);
+                this.sqlException = new SQLTimeoutException("Execution exceeded time");
+            }
+            catch (ExecutionException e) {
+                handler.cancel(true);
+                this.sqlException = new SQLException("Error while executing query");
+            }
+            catch (InterruptedException e) {
+                handler.cancel(true);
+                this.sqlException = new SQLTimeoutException("Thread was interrupted");
             }
 
             executorService.shutdownNow();
@@ -145,30 +146,25 @@ public class Statement implements java.sql.Statement {
         Query query = QueryBuilder.buildQuery(sql);
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<Boolean> future = executor.submit(() -> {
-            try {
-                return query.executeWithoutPrinting(database, sql);
-            }
-            catch (SQLException e) {
-                Statement.this.sqlException = e;
-                return false;
-            }
-        });
+        Future<Boolean> future = executor.submit(() -> query.executeWithoutPrinting(database, sql));
 
         boolean flag = false;
         try{
             flag = future.get(getQueryTimeout(), TimeUnit.SECONDS);
-        } catch (TimeoutException | InterruptedException | ExecutionException | SQLException e) {
-
-            future.cancel(true);
-
-            if (e instanceof SQLTimeoutException)
-                throw new SQLTimeoutException("Time Exceeded ");
-
-            else if (e instanceof SQLException)
-                throw new SQLException(String.valueOf(((SQLException) e).getErrorCode()));
-
         }
+        catch (TimeoutException e) {
+            future.cancel(true);
+            this.sqlException = new SQLTimeoutException("Execution exceeded time");
+        }
+        catch (ExecutionException e) {
+            future.cancel(true);
+            this.sqlException = new SQLException("Error while executing query");
+        }
+        catch (InterruptedException e) {
+            future.cancel(true);
+            this.sqlException = new SQLTimeoutException("Thread was interrupted");
+        }
+
         executor.shutdownNow();
 
         // If an exception was thrown
@@ -180,21 +176,25 @@ public class Statement implements java.sql.Statement {
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<ResultSet> future = executor.submit(() -> {
-            try {
-                return this.executeQueryInThread(sql);
-            } catch (SQLException e) {
-                Statement.this.sqlException = e;
-                return null;
-            }
-        });
+        Future<ResultSet> future = executor.submit(() -> this.executeQueryInThread(sql));
 
         ResultSet resultSet = null;
         try{
             resultSet = future.get(getQueryTimeout(), TimeUnit.SECONDS);
-        } catch (TimeoutException | InterruptedException | ExecutionException e) {
-            future.cancel(true);
         }
+        catch (TimeoutException e) {
+            future.cancel(true);
+            this.sqlException = new SQLTimeoutException("Execution exceeded time");
+        }
+        catch (ExecutionException e) {
+            future.cancel(true);
+            this.sqlException = new SQLException("Error while executing query");
+        }
+        catch (InterruptedException e) {
+            future.cancel(true);
+            this.sqlException = new SQLTimeoutException("Thread was interrupted");
+        }
+
         executor.shutdownNow();
 
         // If an exception was thrown
@@ -234,8 +234,17 @@ public class Statement implements java.sql.Statement {
         try {
             result = handler.get(timeoutSeconds, TimeUnit.SECONDS);
         }
-        catch (Exception e) {
+        catch (TimeoutException e) {
             handler.cancel(true);
+            this.sqlException = new SQLTimeoutException("Execution exceeded time");
+        }
+        catch (ExecutionException e) {
+            handler.cancel(true);
+            this.sqlException = new SQLException("Error while executing query");
+        }
+        catch (InterruptedException e) {
+            handler.cancel(true);
+            this.sqlException = new SQLTimeoutException("Thread was interrupted");
         }
 
         executorService.shutdownNow();
