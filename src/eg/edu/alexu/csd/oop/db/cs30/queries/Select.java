@@ -1,8 +1,12 @@
 package eg.edu.alexu.csd.oop.db.cs30.queries;
 
 import eg.edu.alexu.csd.oop.db.Database;
+import eg.edu.alexu.csd.oop.db.cs30.DataBaseGenerator;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,25 +32,48 @@ public class Select implements Query {
 
     @Override
     public void execute(Database database, String query) throws SQLException {
+        print(database.executeQuery(checkOrderBy(query)));
+    }
 
-        Object[][] objects = database.executeQuery(checkOrderBy(query));
+    @Override
+    public void execute(Statement statement, String query) throws SQLException {
+        ResultSet resultSet = statement.executeQuery(query);
+
+        ResultSetMetaData metaData = resultSet.getMetaData();
+
+        for (int i = 0; i < metaData.getColumnCount(); i++)
+            System.out.print(metaData.getColumnName(i) + '\t');
+
+        System.out.println();
+
+        while (resultSet.next()) {
+            for (int i = 0; i < metaData.getColumnCount(); i++) {
+                if (metaData.getColumnType(i) == 1) {
+                    System.out.print(resultSet.getInt(i) + '\t');
+                } else {
+                    System.out.print(resultSet.getString(i) + '\t');
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public boolean executeWithoutPrinting(Database database, String query) throws SQLException {
+        return database.executeQuery(query).length > 0;
+    }
+
+    private void print(Object[][]objects) throws SQLException {
 
         try{
             if (orderColumns != null)
             {
-                Object [][] orderedObjects = new Object[objects.length - 1][objects[0].length];
-
-                for (int i = 0; i < orderedObjects.length; i++)
-                    if (orderedObjects[i].length >= 0)
-                        System.arraycopy(objects[i + 1], 0, orderedObjects[i], 0, orderedObjects[i].length);
-
-                Object[][] finalObjects = objects;
                 Arrays.sort(objects, (o1, o2) -> {
                     for (int i = 0; i < orderColumns.size(); i++) {
 
                         String order = orderColumns.get(i);
 
-                        int col = searchForCol(order, finalObjects[0]);
+                        int col = searchForCol(order, DataBaseGenerator.getSelectedColumnNames());
 
                         if (col == -1) throw new RuntimeException("THERE'S NO COLUMN WITH THAT NAME !!!!!!!!!!!!!");
 
@@ -68,8 +95,7 @@ public class Select implements Query {
                     }
                     return 0;
                 });
-                print(objects[0]);
-                objects = orderedObjects;
+                print(DataBaseGenerator.getSelectedColumnNames());
             }
         } catch (RuntimeException e) {
             throw new SQLException("THERE'S NO COLUMN WITH THAT NAME !!!!!!!!!!!!!!!");
@@ -77,12 +103,6 @@ public class Select implements Query {
 
         for (Object[] objectsArr : objects)
             print(objectsArr);
-
-    }
-
-    @Override
-    public boolean executeWithoutPrinting(Database database, String query) throws SQLException {
-        return database.executeQuery(query).length > 0;
     }
 
     /**

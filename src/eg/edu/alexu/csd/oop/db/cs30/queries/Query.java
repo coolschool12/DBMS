@@ -3,6 +3,7 @@ package eg.edu.alexu.csd.oop.db.cs30.queries;
 import eg.edu.alexu.csd.oop.db.Database;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Represents SQL query
@@ -23,6 +24,8 @@ public interface Query {
      * Execute query's operation, and print output
      */
     void execute(Database database, String query) throws SQLException;
+
+    void execute(Statement statement, String query) throws SQLException;
 
     boolean executeWithoutPrinting(Database database, String query) throws SQLException;
 }
