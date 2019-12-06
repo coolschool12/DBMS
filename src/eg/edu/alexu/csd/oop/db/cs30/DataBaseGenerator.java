@@ -4,7 +4,6 @@ import eg.edu.alexu.csd.oop.db.Database;
 import eg.edu.alexu.csd.oop.db.cs30.queries.ExtractData;
 import eg.edu.alexu.csd.oop.db.cs30.queries.Query;
 import eg.edu.alexu.csd.oop.db.cs30.queries.QueryBuilder;
-import sun.rmi.runtime.Log;
 
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
