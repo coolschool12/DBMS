@@ -42,18 +42,27 @@ public class Select implements Query {
         ResultSetMetaData metaData = resultSet.getMetaData();
 
         for (int i = 0; i < metaData.getColumnCount(); i++)
-            System.out.print(metaData.getColumnName(i) + '\t');
+            System.out.print(metaData.getColumnName(i) + "\t");
 
         System.out.println();
 
         while (resultSet.next()) {
             for (int i = 0; i < metaData.getColumnCount(); i++) {
                 if (metaData.getColumnType(i) == 1) {
-                    System.out.print(resultSet.getInt(i) + '\t');
+                    try{
+                        System.out.print(resultSet.getInt(i) + "\t");
+                    }catch ( NullPointerException e){
+                        System.out.print("null" + "\t");
+                    }
                 } else {
-                    System.out.print(resultSet.getString(i) + '\t');
+                    try{
+                        System.out.print(resultSet.getString(i) + "\t");
+                    }catch ( NullPointerException e){
+                        System.out.print("null" + "\t");
+                    }
                 }
             }
+            System.out.println();
         }
 
     }
