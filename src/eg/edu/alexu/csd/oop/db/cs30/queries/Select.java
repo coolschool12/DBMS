@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  */
 public class Select implements Query {
     private List<String> orderColumns = null;
-    private List<Integer> whichOrder = null; // 0: ASC, 1: DESC
+    private List<Integer> whichOrder = null; // 1: ASC, 0: DESC
 
     @Override
     public boolean isCorrect(String query) {
@@ -141,7 +141,7 @@ public class Select implements Query {
                     if (columnOrderSplit.length == 1)
                     {
                         orderColumns.add(columnOrderSplit[0]);
-                        whichOrder.add(0);
+                        whichOrder.add(1);
                     }
                     else if (columnOrderSplit.length == 2)
                     {
@@ -149,11 +149,11 @@ public class Select implements Query {
 
                         if (columnOrderSplit[1].equalsIgnoreCase("ASC"))
                         {
-                            whichOrder.add(0);
+                            whichOrder.add(1);
                         }
                         else if (columnOrderSplit[1].equalsIgnoreCase("DESC"))
                         {
-                            whichOrder.add(1);
+                            whichOrder.add(0);
                         }
                         else
                         {
