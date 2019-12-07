@@ -32,7 +32,10 @@ public class Select implements Query {
 
     @Override
     public void execute(Database database, String query) throws SQLException {
-        print(database.executeQuery(checkOrderBy(query)));
+        Object[][] objects = setOrder(database.executeQuery(checkOrderBy(query)));
+        print(DataBaseGenerator.getSelectedColumnNames());
+        for (Object[] objectsArr : objects)
+            print(objectsArr);
     }
 
     @Override
@@ -72,7 +75,7 @@ public class Select implements Query {
         return database.executeQuery(query).length > 0;
     }
 
-    private void print(Object[][]objects) throws SQLException {
+    private Object[][] setOrder(Object[][]objects) {
 
         try{
             if (orderColumns != null)
@@ -104,14 +107,11 @@ public class Select implements Query {
                     }
                     return 0;
                 });
-                print(DataBaseGenerator.getSelectedColumnNames());
             }
         } catch (RuntimeException e) {
-            throw new SQLException("THERE'S NO COLUMN WITH THAT NAME !!!!!!!!!!!!!!!");
+            return objects;
         }
-
-        for (Object[] objectsArr : objects)
-            print(objectsArr);
+        return objects;
     }
 
     /**
