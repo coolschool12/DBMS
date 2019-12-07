@@ -1,5 +1,6 @@
 package eg.edu.alexu.csd.oop.db.cs30.jdbc;
 
+import eg.edu.alexu.csd.oop.db.cs30.DataBaseGenerator;
 import eg.edu.alexu.csd.oop.db.cs30.queries.Query;
 import eg.edu.alexu.csd.oop.db.cs30.queries.QueryBuilder;
 
@@ -9,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 public class UI {
 
@@ -26,6 +28,10 @@ public class UI {
         Statement statement;
         try {
             connection = driver.connect("jdbc:xmldb://localhost", info);
+            Logger logger = ((DataBaseGenerator)DataBaseGenerator.makeInstance()).getMyLogger();
+            logger.info("Driver is installed");
+            logger.info("Connection is established with url jdbc:xmldb://localhost");
+            logger.info("Statement is Created");
             statement = connection.createStatement();
 
             // Take user input
@@ -49,17 +55,20 @@ public class UI {
                     query.execute(statement, queryString.toLowerCase());
                 } catch (SQLException e) {
                     System.out.println(e.getMessage());
+                    logger.severe(e.getMessage());
                 } catch (NullPointerException e) {
                     System.out.println("Error: There's no database");
+                    logger.severe("Error: There's no database");
                 } catch (Exception e) {
                     System.out.println("Error: there's something incorrect");
+                    logger.severe("Error: there's something incorrect");
                 }
 
                 System.out.println();
             }
         } catch (SQLException e) {
             System.out.println("can't establish a connection");
+
         }
     }
-
 }
