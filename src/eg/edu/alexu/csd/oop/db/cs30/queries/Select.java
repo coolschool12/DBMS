@@ -45,24 +45,28 @@ public class Select implements Query {
         ResultSetMetaData metaData = resultSet.getMetaData();
 
         for (int i = 0; i < metaData.getColumnCount(); i++)
-            System.out.print(metaData.getColumnName(i) + "\t");
+            System.out.print(metaData.getColumnName(i + 1) + "\t");
 
         System.out.println();
 
         while (resultSet.next()) {
             for (int i = 0; i < metaData.getColumnCount(); i++) {
-                if (metaData.getColumnType(i) == 1) {
+                if (metaData.getColumnType(i + 1) == 1) {
                     try{
-                        System.out.print(resultSet.getInt(i) + "\t");
+                        System.out.print(resultSet.getInt(i + 1) + "\t");
                     }catch ( NullPointerException e){
                         System.out.print("null" + "\t");
                     }
-                } else {
+                } else if(metaData.getColumnType(i + 1) == 0) {
                     try{
-                        System.out.print(resultSet.getString(i) + "\t");
+                        System.out.print(resultSet.getString(i + 1) + "\t");
                     }catch ( NullPointerException e){
                         System.out.print("null" + "\t");
                     }
+                }
+                else
+                {
+                    System.out.print(resultSet.getObject(i + 1).toString() + "\t");
                 }
             }
             System.out.println();

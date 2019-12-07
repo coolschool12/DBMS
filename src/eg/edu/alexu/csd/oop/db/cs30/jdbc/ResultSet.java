@@ -37,17 +37,17 @@ public class ResultSet implements java.sql.ResultSet {
     public String getString(int columnIndex) throws SQLException {
         if(info == null)
             throw new SQLException("result set is closed");
-        if(info.getColumnTypes()[columnIndex] != 0)
+        if(info.getColumnTypes()[columnIndex - 1] != 0)
             throw new SQLException("wrong type for column "+info.getColumnNames()[columnIndex]+" wih index "+columnIndex);
-        return (String) info.getResult()[cursor-1][columnIndex];
+        return (String) info.getResult()[cursor-1][columnIndex - 1];
     }
     @Override
     public int getInt(int columnIndex) throws SQLException {
         if(info == null)
             throw new SQLException("result set is closed");
-        if(info.getColumnTypes()[columnIndex] != 1)
+        if(info.getColumnTypes()[columnIndex - 1] != 1)
             throw new SQLException("wrong type for column "+info.getColumnNames()[columnIndex]+" wih index "+columnIndex);
-        return (int) info.getResult()[cursor-1][columnIndex];
+        return (int) info.getResult()[cursor-1][columnIndex - 1];
     }
     @Override
     public String getString(String columnLabel) throws SQLException {

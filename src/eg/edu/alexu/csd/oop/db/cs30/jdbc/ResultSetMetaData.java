@@ -49,12 +49,12 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
 
     @Override
     public String getColumnLabel(int column) throws SQLException {
-        return info.getColumnNames()[column];
+        return info.getColumnNames()[column - 1];
     }
 
     @Override
     public String getColumnName(int column) throws SQLException {
-        return info.getColumnNames()[column];
+        return info.getColumnNames()[column - 1];
     }
 
     @Override
@@ -80,7 +80,7 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
 
     @Override
     public int getColumnType(int column) throws SQLException {
-        return info.getColumnTypes()[column];
+        return info.getColumnTypes()[column - 1];
     }
 
     @Override
