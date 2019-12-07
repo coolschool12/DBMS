@@ -52,17 +52,17 @@ public class Driver implements java.sql.Driver {
 
     @Override
     public int getMajorVersion() {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int getMinorVersion() {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean jdbcCompliant() {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
